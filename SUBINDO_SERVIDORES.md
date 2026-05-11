@@ -8,11 +8,12 @@ Você precisa de **dois terminais abertos** — um para o back-end e um para o f
 
 ```bash
 cd /Users/andresa/Documents/ApiClientes
-dotnet run
+ASPNETCORE_ENVIRONMENT=Development dotnet run
 ```
 
 Aguarde aparecer:
 ```
+Hosting environment: Development
 Now listening on: http://localhost:5067
 ```
 
