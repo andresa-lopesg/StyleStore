@@ -4,6 +4,27 @@ Você precisa de **dois terminais abertos** — um para o back-end e um para o f
 
 ---
 
+## Antes de tudo — PostgreSQL
+
+O banco roda em segundo plano (não precisa de terminal aberto), mas precisa estar ligado.
+
+Como o PostgreSQL está instalado como aplicativo no Mac:
+
+1. Abra o **Finder → Aplicativos → PostgreSQL 18**
+2. Clique duas vezes para abrir
+3. Clique em **Start** se o servidor estiver parado
+
+Ou via terminal:
+```bash
+open /Applications/PostgreSQL\ 18/pgAdmin\ 4.app
+```
+
+> Enquanto o ícone do PostgreSQL estiver na barra de menu, o banco está rodando.
+
+---
+
+---
+
 ## Terminal 1 — Back-end (API .NET)
 
 ```bash
