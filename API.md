@@ -1,7 +1,7 @@
 # Documentação da API — StyleStore
 
-API RESTful construída em **ASP.NET Core 8** conectada ao **PostgreSQL** via Entity Framework Core 8.  
-Banco de dados no schema `apiclientes`.
+API RESTful construída em **ASP.NET Core 8** conectada ao **SQL Server (Azure SQL Edge)** via Entity Framework Core 8.  
+Banco de dados: `loja`.
 
 ---
 
@@ -34,10 +34,11 @@ Banco de dados no schema `apiclientes`.
 │ :5173            │         JSON            │   :5067              │
 └──────────────────┘                         └──────────┬───────────┘
                                                         │ Entity Framework Core 8
-                                                        │ (Npgsql)
+                                                        │ (SqlServer)
                                              ┌──────────▼───────────┐
-                                             │   PostgreSQL 18       │
-                                             │   schema: apiclientes │
+                                             │  Azure SQL Edge       │
+                                             │  Docker :1433         │
+                                             │  database: loja       │
                                              └──────────────────────┘
 ```
 
@@ -687,13 +688,13 @@ flowchart TD
     C -->|Origem bloqueada| E[403 Forbidden]
     D --> F[Controller]
     F --> G[AppDbContext\nEntity Framework]
-    G -->|SQL Query| H[(PostgreSQL\nschema: apiclientes)]
+    G -->|SQL Query| H[(Azure SQL Edge\ndatabase: loja)]
     H -->|Result Set| G
     G -->|C# Objects| F
     F -->|Serialização JSON| I[HTTP Response]
     I --> A
 
-    style H fill:#336791,color:#fff
+    style H fill:#CC2927,color:#fff
     style F fill:#512BD4,color:#fff
     style A fill:#61DAFB,color:#000
 ```
@@ -726,15 +727,15 @@ O EF Core carrega grafos de objetos com referências para os dois lados de uma r
    - `Funcionario.Pedidos` — evita loop Funcionario → Pedido → Funcionario
    - `ItemPedido.Pedido` — evita loop ItemPedido → Pedido → Itens → ItemPedido
 
-### Schema do Banco
+### Banco de Dados
 
-O schema `apiclientes` é definido no `AppDbContext`:
+O banco `loja` roda no **Azure SQL Edge via Docker** na porta `1433`. A string de conexão fica em `appsettings.Development.json` (arquivo ignorado pelo git por conter credenciais).
 
-```csharp
-modelBuilder.HasDefaultSchema("apiclientes");
+Para subir o container:
+
+```bash
+docker run -d --name sql_edge -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=SuaSenha' -p 1433:1433 mcr.microsoft.com/azure-sql-edge
 ```
-
-Isso significa que todas as tabelas ficam em `apiclientes.Categorias`, `apiclientes.Produtos`, etc.
 
 ### Seed de Dados
 
