@@ -12,7 +12,7 @@ Sistema completo para gerenciamento de uma loja de moda, com painel administrati
 | .NET | 8.0 |
 | ASP.NET Core (Web API) | 8.0 |
 | Entity Framework Core | 8.0 |
-| PostgreSQL (Npgsql) | 8.0 |
+| SQL Server (Azure SQL Edge) | 8.0 |
 | Swagger / OpenAPI | 6.6 |
 
 ### Front-end
@@ -74,17 +74,23 @@ ApiClientes/
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 18+](https://nodejs.org)
-- [PostgreSQL](https://www.postgresql.org/download/) rodando localmente
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) para rodar o SQL Server (Azure SQL Edge)
 
 ---
 
 ## Configuração do Banco de Dados
 
-Edite a string de conexão em `appsettings.json`:
+O banco roda no **Azure SQL Edge via Docker**. Suba o container antes de iniciar a API:
+
+```bash
+docker run -d --name sql_edge -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=SuaSenha' -p 1433:1433 mcr.microsoft.com/azure-sql-edge
+```
+
+Edite a string de conexão em `appsettings.Development.json`:
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=clientes;Username=postgres;Password=SUA_SENHA"
+  "DefaultConnection": "Server=localhost,1433;Database=loja;User Id=sa;Password=SuaSenha;TrustServerCertificate=True"
 }
 ```
 

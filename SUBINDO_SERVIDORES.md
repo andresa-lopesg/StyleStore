@@ -4,22 +4,24 @@ Você precisa de **dois terminais abertos** — um para o back-end e um para o f
 
 ---
 
-## Antes de tudo — PostgreSQL
+## Antes de tudo — SQL Server (Docker)
 
-O banco roda em segundo plano (não precisa de terminal aberto), mas precisa estar ligado.
+O banco roda em um container Docker. Você precisa ter o **Docker Desktop** aberto.
 
-Como o PostgreSQL está instalado como aplicativo no Mac:
+1. Abra o **Docker Desktop** e aguarde inicializar (ícone da baleia na barra de menu)
+2. Suba o container do banco (apenas na primeira vez):
 
-1. Abra o **Finder → Aplicativos → PostgreSQL 18**
-2. Clique duas vezes para abrir
-3. Clique em **Start** se o servidor estiver parado
-
-Ou via terminal:
 ```bash
-open /Applications/PostgreSQL\ 18/pgAdmin\ 4.app
+docker run -d --name sql_edge -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=${SA_PASSWORD}' -p 1433:1433 mcr.microsoft.com/azure-sql-edge
 ```
 
-> Enquanto o ícone do PostgreSQL estiver na barra de menu, o banco está rodando.
+3. Nas próximas vezes, se o container já existir, basta iniciar:
+
+```bash
+docker start sql_edge
+```
+
+> Para verificar se está rodando: `docker ps | grep sql_edge`
 
 ---
 
