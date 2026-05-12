@@ -12,7 +12,7 @@ Sistema completo para gerenciamento de uma loja de moda, com painel administrati
 | .NET | 8.0 |
 | ASP.NET Core (Web API) | 8.0 |
 | Entity Framework Core | 8.0 |
-| SQL Server (Azure SQL Edge) | 8.0 |
+| SQL Server (Azure SQL Edge) | latest |
 | Swagger / OpenAPI | 6.6 |
 
 ### Front-end
@@ -102,11 +102,11 @@ Edite a string de conexão em `appsettings.Development.json`:
 
 ```bash
 # Na raiz do projeto
-dotnet run
+dotnet run --environment Development
 ```
 
-A API estará disponível em `http://localhost:5084`
-Documentação Swagger em `http://localhost:5084/swagger`
+A API estará disponível em `http://localhost:5067`
+Documentação Swagger em `http://localhost:5067/swagger`
 
 ### 2. Front-end
 
