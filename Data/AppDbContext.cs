@@ -15,9 +15,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ItemPedido> ItensPedido { get; set; }
     public DbSet<Producao> Producoes { get; set; }
 
+
+//configuram o schema e tipos de coluna. As colunas de cada tabela são definidas pelos Models na pasta Models/. Tudo isso é interpretado pelo Entity Framework para criar o banco automaticamente.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("apiclientes");
+        modelBuilder.HasDefaultSchema("dbo");  
 
         modelBuilder.Entity<Produto>()
             .Property(p => p.Preco)

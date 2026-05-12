@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiClientes.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260512111540_InitialCreate")]
+    [Migration("20260512143414_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace ApiClientes.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("apiclientes")
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -50,7 +50,7 @@ namespace ApiClientes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categorias", "apiclientes");
+                    b.ToTable("Categorias", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Cliente", b =>
@@ -75,7 +75,7 @@ namespace ApiClientes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clientes", "apiclientes");
+                    b.ToTable("Clientes", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Funcionario", b =>
@@ -120,7 +120,7 @@ namespace ApiClientes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Funcionarios", "apiclientes");
+                    b.ToTable("Funcionarios", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.ItemPedido", b =>
@@ -155,7 +155,7 @@ namespace ApiClientes.Migrations
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("ItensPedido", "apiclientes");
+                    b.ToTable("ItensPedido", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Pedido", b =>
@@ -202,7 +202,7 @@ namespace ApiClientes.Migrations
 
                     b.HasIndex("FuncionarioId");
 
-                    b.ToTable("Pedidos", "apiclientes");
+                    b.ToTable("Pedidos", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Producao", b =>
@@ -245,7 +245,7 @@ namespace ApiClientes.Migrations
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("Producoes", "apiclientes");
+                    b.ToTable("Producoes", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Produto", b =>
@@ -292,7 +292,7 @@ namespace ApiClientes.Migrations
 
                     b.HasIndex("CategoriaId");
 
-                    b.ToTable("Produtos", "apiclientes");
+                    b.ToTable("Produtos", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.ProdutoVariante", b =>
@@ -324,7 +324,7 @@ namespace ApiClientes.Migrations
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("ProdutoVariantes", "apiclientes");
+                    b.ToTable("ProdutoVariantes", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Usuario", b =>
@@ -352,7 +352,7 @@ namespace ApiClientes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios", "apiclientes");
+                    b.ToTable("Usuarios", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.ItemPedido", b =>

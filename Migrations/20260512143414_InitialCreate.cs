@@ -12,11 +12,11 @@ namespace ApiClientes.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "apiclientes");
+                name: "dbo");
 
             migrationBuilder.CreateTable(
                 name: "Categorias",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -33,7 +33,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Clientes",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -49,7 +49,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Funcionarios",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -71,7 +71,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Usuarios",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -88,7 +88,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Produtos",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -110,7 +110,7 @@ namespace ApiClientes.Migrations
                     table.ForeignKey(
                         name: "FK_Produtos_Categorias_CategoriaId",
                         column: x => x.CategoriaId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Categorias",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -118,7 +118,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Pedidos",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -140,21 +140,21 @@ namespace ApiClientes.Migrations
                     table.ForeignKey(
                         name: "FK_Pedidos_Clientes_ClienteId",
                         column: x => x.ClienteId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Clientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Pedidos_Funcionarios_FuncionarioId",
                         column: x => x.FuncionarioId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Funcionarios",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Producoes",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -175,7 +175,7 @@ namespace ApiClientes.Migrations
                     table.ForeignKey(
                         name: "FK_Producoes_Produtos_ProdutoId",
                         column: x => x.ProdutoId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Produtos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -183,7 +183,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ProdutoVariantes",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -200,7 +200,7 @@ namespace ApiClientes.Migrations
                     table.ForeignKey(
                         name: "FK_ProdutoVariantes_Produtos_ProdutoId",
                         column: x => x.ProdutoId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Produtos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -208,7 +208,7 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ItensPedido",
-                schema: "apiclientes",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -226,14 +226,14 @@ namespace ApiClientes.Migrations
                     table.ForeignKey(
                         name: "FK_ItensPedido_Pedidos_PedidoId",
                         column: x => x.PedidoId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Pedidos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ItensPedido_Produtos_ProdutoId",
                         column: x => x.ProdutoId,
-                        principalSchema: "apiclientes",
+                        principalSchema: "dbo",
                         principalTable: "Produtos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -241,43 +241,43 @@ namespace ApiClientes.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItensPedido_PedidoId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "ItensPedido",
                 column: "PedidoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItensPedido_ProdutoId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "ItensPedido",
                 column: "ProdutoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pedidos_ClienteId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "Pedidos",
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pedidos_FuncionarioId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "Pedidos",
                 column: "FuncionarioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Producoes_ProdutoId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "Producoes",
                 column: "ProdutoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Produtos_CategoriaId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "Produtos",
                 column: "CategoriaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProdutoVariantes_ProdutoId",
-                schema: "apiclientes",
+                schema: "dbo",
                 table: "ProdutoVariantes",
                 column: "ProdutoId");
         }
@@ -287,39 +287,39 @@ namespace ApiClientes.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ItensPedido",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Producoes",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "ProdutoVariantes",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Usuarios",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Pedidos",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Produtos",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Clientes",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Funcionarios",
-                schema: "apiclientes");
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Categorias",
-                schema: "apiclientes");
+                schema: "dbo");
         }
     }
 }

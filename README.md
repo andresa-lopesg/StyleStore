@@ -1,6 +1,6 @@
 # StyleStore — Sistema de Gestão de Loja
 
-Sistema completo para gerenciamento de uma loja de moda, com painel administrativo dark mode, CRUD de todos os módulos e integração entre front-end e back-end.
+sistema administrativo interno de uma loja que gerencia pedidos, produtos, clientes, funcionários, produção e estoque
 
 ---
 
@@ -56,7 +56,8 @@ ApiClientes/
 ├── Data/
 │   └── AppDbContext.cs    # Contexto do Entity Framework
 ├── Migrations/            # Migrações do banco de dados
-├── appsettings.json       # String de conexão e configurações
+├── appsettings.json                # Configurações gerais
+├── appsettings.Development.json    # String de conexão (ignorado pelo git)
 ├── Program.cs             # Configuração da aplicação
 └── frontend/              # Aplicação React
     └── src/
