@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { funcionariosService } from '../services/funcionarios';
 import type { Funcionario } from '../types';
+import { useToast } from '../context/ToastContext';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -17,6 +18,7 @@ const cargos = ['Gerente', 'Vendedor', 'Caixa', 'Estoquista', 'Costureiro', 'Des
 
 export default function Funcionarios() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -27,17 +29,20 @@ export default function Funcionarios() {
 
   const createMutation = useMutation({
     mutationFn: funcionariosService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['funcionarios'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['funcionarios'] }); closeModal(); toast('Funcionário criado com sucesso'); },
+    onError: () => toast('Erro ao criar funcionário. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Funcionario }) => funcionariosService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['funcionarios'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['funcionarios'] }); closeModal(); toast('Funcionário atualizado com sucesso'); },
+    onError: () => toast('Erro ao atualizar funcionário. Tente novamente.', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: funcionariosService.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['funcionarios'] }); setDeleteId(null); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['funcionarios'] }); setDeleteId(null); toast('Funcionário excluído com sucesso'); },
+    onError: () => toast('Erro ao excluir funcionário. Tente novamente.', 'error'),
   });
 
   function openCreate() {

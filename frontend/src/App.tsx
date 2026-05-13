@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from './context/ToastContext';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Clientes from './pages/Clientes';
@@ -21,19 +22,21 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/clientes" element={<Clientes />} />
-            <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/funcionarios" element={<Funcionarios />} />
-            <Route path="/categorias" element={<Categorias />} />
-            <Route path="/produtos" element={<Produtos />} />
-            <Route path="/pedidos" element={<Pedidos />} />
-            <Route path="/producao" element={<Producao />} />
-            <Route path="/estoque" element={<Estoque />} />
-          </Route>
-        </Routes>
+        <ToastProvider>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/clientes" element={<Clientes />} />
+              <Route path="/usuarios" element={<Usuarios />} />
+              <Route path="/funcionarios" element={<Funcionarios />} />
+              <Route path="/categorias" element={<Categorias />} />
+              <Route path="/produtos" element={<Produtos />} />
+              <Route path="/pedidos" element={<Pedidos />} />
+              <Route path="/producao" element={<Producao />} />
+              <Route path="/estoque" element={<Estoque />} />
+            </Route>
+          </Routes>
+        </ToastProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

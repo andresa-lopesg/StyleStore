@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { producaoService } from '../services/producao';
 import { produtosService } from '../services/produtos';
 import type { Producao, StatusProducao as StatusProducaoEnum } from '../types';
+import { useToast } from '../context/ToastContext';
 import { StatusProducaoLabel } from '../types';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
@@ -24,6 +25,7 @@ const statusColors: Record<number, 'yellow' | 'blue' | 'gray' | 'green' | 'red'>
 
 export default function Producao() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -35,17 +37,20 @@ export default function Producao() {
 
   const createMutation = useMutation({
     mutationFn: producaoService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['producao'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['producao'] }); closeModal(); toast('Ordem de produção criada com sucesso'); },
+    onError: () => toast('Erro ao criar ordem de produção. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Producao }) => producaoService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['producao'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['producao'] }); closeModal(); toast('Ordem de produção atualizada com sucesso'); },
+    onError: () => toast('Erro ao atualizar ordem de produção. Tente novamente.', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: producaoService.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['producao'] }); setDeleteId(null); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['producao'] }); setDeleteId(null); toast('Ordem de produção excluída com sucesso'); },
+    onError: () => toast('Erro ao excluir ordem de produção. Tente novamente.', 'error'),
   });
 
   function openCreate() {

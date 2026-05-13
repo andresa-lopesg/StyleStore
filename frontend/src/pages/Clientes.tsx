@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { clientesService } from '../services/clientes';
 import type { Cliente } from '../types';
+import { useToast } from '../context/ToastContext';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -14,6 +15,7 @@ type FormData = Omit<Cliente, 'id'>;
 
 export default function Clientes() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -25,17 +27,20 @@ export default function Clientes() {
 
   const createMutation = useMutation({
     mutationFn: clientesService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clientes'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clientes'] }); closeModal(); toast('Cliente criado com sucesso'); },
+    onError: () => toast('Erro ao criar cliente. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Cliente }) => clientesService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clientes'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clientes'] }); closeModal(); toast('Cliente atualizado com sucesso'); },
+    onError: () => toast('Erro ao atualizar cliente. Tente novamente.', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: clientesService.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clientes'] }); setDeleteId(null); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clientes'] }); setDeleteId(null); toast('Cliente excluído com sucesso'); },
+    onError: () => toast('Erro ao excluir cliente. Tente novamente.', 'error'),
   });
 
   function openCreate() { setEditing(null); reset({ nome: '', email: '', telefone: '' }); setModalOpen(true); }

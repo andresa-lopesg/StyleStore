@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { produtosService } from '../services/produtos';
 import { categoriasService } from '../services/categorias';
 import type { Produto } from '../types';
+import { useToast } from '../context/ToastContext';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -19,6 +20,7 @@ type FormData = {
 
 export default function Produtos() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -30,17 +32,20 @@ export default function Produtos() {
 
   const createMutation = useMutation({
     mutationFn: produtosService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); toast('Produto criado com sucesso'); },
+    onError: () => toast('Erro ao criar produto. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Produto }) => produtosService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); toast('Produto atualizado com sucesso'); },
+    onError: () => toast('Erro ao atualizar produto. Tente novamente.', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: produtosService.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); setDeleteId(null); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); setDeleteId(null); toast('Produto excluído com sucesso'); },
+    onError: () => toast('Erro ao excluir produto. Tente novamente.', 'error'),
   });
 
   function openCreate() {

@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Search, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { categoriasService } from '../services/categorias';
 import type { Categoria } from '../types';
+import { useToast } from '../context/ToastContext';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -15,6 +16,7 @@ type FormData = { nome: string; descricao: string; ativa: boolean };
 
 export default function Categorias() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -25,17 +27,20 @@ export default function Categorias() {
 
   const createMutation = useMutation({
     mutationFn: categoriasService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categorias'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categorias'] }); closeModal(); toast('Categoria criada com sucesso'); },
+    onError: () => toast('Erro ao criar categoria. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Categoria }) => categoriasService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categorias'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categorias'] }); closeModal(); toast('Categoria atualizada com sucesso'); },
+    onError: () => toast('Erro ao atualizar categoria. Tente novamente.', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: categoriasService.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categorias'] }); setDeleteId(null); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categorias'] }); setDeleteId(null); toast('Categoria excluída com sucesso'); },
+    onError: () => toast('Erro ao excluir categoria. Tente novamente.', 'error'),
   });
 
   function openCreate() { setEditing(null); reset({ nome: '', descricao: '', ativa: true }); setModalOpen(true); }

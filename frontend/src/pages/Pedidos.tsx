@@ -6,6 +6,7 @@ import { pedidosService } from '../services/pedidos';
 import { clientesService } from '../services/clientes';
 import { funcionariosService } from '../services/funcionarios';
 import type { Pedido, StatusPedido } from '../types';
+import { useToast } from '../context/ToastContext';
 import { StatusPedidoLabel } from '../types';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
@@ -25,6 +26,7 @@ const statusColors: Record<number, 'yellow' | 'blue' | 'purple' | 'indigo' | 'gr
 
 export default function Pedidos() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -38,17 +40,20 @@ export default function Pedidos() {
 
   const createMutation = useMutation({
     mutationFn: pedidosService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); closeModal(); toast('Pedido criado com sucesso'); },
+    onError: () => toast('Erro ao criar pedido. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Pedido }) => pedidosService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); closeModal(); toast('Pedido atualizado com sucesso'); },
+    onError: () => toast('Erro ao atualizar pedido. Tente novamente.', 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: pedidosService.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); setDeleteId(null); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); setDeleteId(null); toast('Pedido excluído com sucesso'); },
+    onError: () => toast('Erro ao excluir pedido. Tente novamente.', 'error'),
   });
 
   function openCreate() {
