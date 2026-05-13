@@ -26,7 +26,7 @@ function KpiCard({ title, value, icon: Icon, color, delta, deltaLabel }: {
 }) {
   const positive = (delta ?? 0) >= 0;
   return (
-    <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-5 flex flex-col gap-4">
+    <div className="bg-(--bg-card) rounded-xl p-5 flex flex-col gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
       <div className="flex items-center justify-between">
         <span className="text-xs text-[#666] font-medium uppercase tracking-wide">{title}</span>
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${color}`}>
@@ -92,7 +92,7 @@ export default function Dashboard() {
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 bg-[#111] border border-[#1e1e1e] rounded-xl p-5">
+        <div className="xl:col-span-2 bg-(--bg-card) rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
           <h3 className="text-sm font-semibold text-white mb-4">Receita Mensal</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={vendasMock}>
@@ -114,7 +114,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-5">
+        <div className="bg-(--bg-card) rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
           <h3 className="text-sm font-semibold text-white mb-4">Status dos Pedidos</h3>
           {statusPedidos.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
@@ -134,7 +134,7 @@ export default function Dashboard() {
 
       {/* Últimos pedidos + Top produtos */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-5">
+        <div className="bg-(--bg-card) rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
           <h3 className="text-sm font-semibold text-white mb-4">Últimos Pedidos</h3>
           {ultimosPedidos.length === 0 ? (
             <p className="text-[#555] text-sm text-center py-8">Nenhum pedido ainda</p>
@@ -156,7 +156,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-5">
+        <div className="bg-(--bg-card) rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
           <h3 className="text-sm font-semibold text-white mb-4">Estoque por Categoria</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={produtos.slice(0, 6).map(p => ({ nome: p.nome.substring(0, 12), estoque: p.estoqueTotal }))}>
