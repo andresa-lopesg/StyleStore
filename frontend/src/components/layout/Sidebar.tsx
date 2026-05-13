@@ -24,10 +24,10 @@ export default function Sidebar() {
   return (
     <aside
       style={{ width: collapsed ? 64 : 224 }}
-      className="relative flex flex-col h-screen bg-[#111111] border-r border-[#1e1e1e] transition-all duration-200 shrink-0"
+      className="relative flex flex-col h-screen bg-[var(--bg-card)] border-r border-[var(--border)] transition-all duration-200 shrink-0"
     >
       {/* Logo */}
-      <div className={`flex items-center border-b border-[#1e1e1e] py-5 ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'}`}>
+      <div className={`flex items-center border-b border-[var(--border)] py-5 ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'}`}>
         <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
           <Store size={16} className="text-white" />
         </div>
@@ -53,7 +53,7 @@ export default function Sidebar() {
                 ${collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2.5'}
                 ${active
                   ? 'bg-indigo-600/20 text-indigo-400 font-medium'
-                  : 'text-[#888] hover:bg-[#1a1a1a] hover:text-[#ccc]'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-white'
                 }
               `}
             >
@@ -67,13 +67,13 @@ export default function Sidebar() {
       {/* Collapse button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-[#1e1e1e] border border-[#2a2a2a] flex items-center justify-center text-[#666] hover:text-white transition-colors z-10"
+        className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-input)] flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors z-10"
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
 
       {/* Footer */}
-      <div className={`py-4 border-t border-[#1e1e1e] ${collapsed ? 'flex justify-center px-0' : 'px-3'}`}>
+      <div className={`py-4 border-t border-[var(--border)] ${collapsed ? 'flex justify-center px-0' : 'px-3'}`}>
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
             <span className="text-xs font-bold text-white">A</span>
@@ -81,7 +81,7 @@ export default function Sidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-xs font-medium text-white truncate">Admin</p>
-              <p className="text-[10px] text-[#555] truncate">stylestore.com</p>
+              <p className="text-[10px] text-[var(--text-muted)] truncate">stylestore.com</p>
             </div>
           )}
         </div>

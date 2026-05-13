@@ -6,7 +6,7 @@ interface BadgeProps {
 }
 
 const colors: Record<Color, string> = {
-  gray:   'bg-[#222] text-[#888] border-[#2a2a2a]',
+  gray:   'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border-[var(--border-input)]',
   green:  'bg-green-500/10 text-green-400 border-green-500/20',
   yellow: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   red:    'bg-red-500/10 text-red-400 border-red-500/20',
