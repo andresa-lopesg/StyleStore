@@ -23,7 +23,7 @@ export default function Clientes() {
 
   const { data = [], isLoading } = useQuery({ queryKey: ['clientes'], queryFn: clientesService.getAll });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: clientesService.create,
@@ -96,8 +96,8 @@ export default function Clientes() {
 
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Cliente' : 'Novo Cliente'}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Nome obrigatório' })} error={errors.nome?.message} />
-          <Input label="E-mail" type="email" placeholder="email@exemplo.com" {...register('email', { required: 'E-mail obrigatório' })} error={errors.email?.message} />
+          <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Nome obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
+          <Input label="E-mail" type="email" placeholder="email@exemplo.com" {...register('email', { required: 'E-mail obrigatório' })} error={errors.email?.message} isValid={!!dirtyFields.email && !errors.email} />
           <Input label="Telefone" placeholder="(11) 99999-9999" {...register('telefone')} />
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="secondary" onClick={closeModal}>Cancelar</Button>

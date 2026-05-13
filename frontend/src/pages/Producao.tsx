@@ -33,7 +33,7 @@ export default function Producao() {
 
   const { data = [], isLoading } = useQuery({ queryKey: ['producao'], queryFn: producaoService.getAll });
   const { data: produtos = [] } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: producaoService.create,
@@ -168,16 +168,16 @@ export default function Producao() {
             </select>
             {errors.produtoId && <span className="text-xs text-red-400">{errors.produtoId.message}</span>}
           </div>
-          <Input label="Qtd. Planejada" type="number" placeholder="100" {...register('quantidadePlanejada', { required: 'Obrigatório' })} error={errors.quantidadePlanejada?.message} />
+          <Input label="Qtd. Planejada" type="number" placeholder="100" {...register('quantidadePlanejada', { required: 'Obrigatório' })} error={errors.quantidadePlanejada?.message} isValid={!!dirtyFields.quantidadePlanejada && !errors.quantidadePlanejada} />
           <Input label="Qtd. Produzida" type="number" placeholder="0" {...register('quantidadeProduzida')} />
-          <Input label="Responsável" placeholder="Nome do responsável" {...register('responsavel', { required: 'Obrigatório' })} error={errors.responsavel?.message} />
+          <Input label="Responsável" placeholder="Nome do responsável" {...register('responsavel', { required: 'Obrigatório' })} error={errors.responsavel?.message} isValid={!!dirtyFields.responsavel && !errors.responsavel} />
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Status</label>
             <select {...register('status')} className="h-9 px-3 bg-[#161616] border border-[#2a2a2a] rounded-lg text-sm text-white outline-none focus:border-indigo-600 transition-colors">
               {Object.entries(StatusProducaoLabel).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select>
           </div>
-          <Input label="Data de Início" type="date" {...register('dataInicio', { required: 'Obrigatório' })} error={errors.dataInicio?.message} />
+          <Input label="Data de Início" type="date" {...register('dataInicio', { required: 'Obrigatório' })} error={errors.dataInicio?.message} isValid={!!dirtyFields.dataInicio && !errors.dataInicio} />
           <Input label="Data de Fim (prevista)" type="date" {...register('dataFim')} />
           <div className="col-span-2 flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Observação</label>

@@ -23,7 +23,7 @@ export default function Usuarios() {
   const [editing, setEditing] = useState<Usuario | null>(null);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['usuarios'], queryFn: usuariosService.getAll });
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: usuariosService.create,
@@ -107,8 +107,8 @@ export default function Usuarios() {
 
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Usuário' : 'Novo Usuário'}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Nome obrigatório' })} error={errors.nome?.message} />
-          <Input label="E-mail" type="email" placeholder="email@exemplo.com" {...register('email', { required: 'E-mail obrigatório' })} error={errors.email?.message} />
+          <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Nome obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
+          <Input label="E-mail" type="email" placeholder="email@exemplo.com" {...register('email', { required: 'E-mail obrigatório' })} error={errors.email?.message} isValid={!!dirtyFields.email && !errors.email} />
           <Input label="Senha" type="password" placeholder={editing ? 'Deixe em branco para não alterar' : 'Senha'} {...register('senhaHash', { required: !editing && 'Senha obrigatória' })} error={errors.senhaHash?.message} />
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="secondary" onClick={closeModal}>Cancelar</Button>

@@ -36,7 +36,7 @@ export default function Pedidos() {
   const { data = [], isLoading } = useQuery({ queryKey: ['pedidos'], queryFn: pedidosService.getAll });
   const { data: clientes = [] } = useQuery({ queryKey: ['clientes'], queryFn: clientesService.getAll });
   const { data: funcionarios = [] } = useQuery({ queryKey: ['funcionarios'], queryFn: funcionariosService.getAll });
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: pedidosService.create,
@@ -212,7 +212,7 @@ export default function Pedidos() {
               {funcionarios.filter(f => f.ativo).map(f => <option key={f.id} value={f.id}>{f.nome}</option>)}
             </select>
           </div>
-          <Input label="Total (R$)" type="number" step="0.01" placeholder="0.00" {...register('total', { required: 'Obrigatório' })} error={errors.total?.message} />
+          <Input label="Total (R$)" type="number" step="0.01" placeholder="0.00" {...register('total', { required: 'Obrigatório' })} error={errors.total?.message} isValid={!!dirtyFields.total && !errors.total} />
           <Input label="Desconto (R$)" type="number" step="0.01" placeholder="0.00" {...register('desconto')} />
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Status</label>

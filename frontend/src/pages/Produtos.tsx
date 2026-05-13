@@ -28,7 +28,7 @@ export default function Produtos() {
 
   const { data = [], isLoading } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
   const { data: categorias = [] } = useQuery({ queryKey: ['categorias'], queryFn: categoriasService.getAll });
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: produtosService.create,
@@ -154,7 +154,7 @@ export default function Produtos() {
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Produto' : 'Novo Produto'} size="lg">
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <Input label="Nome do Produto" placeholder="Ex: Camiseta Básica Branca" {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} />
+            <Input label="Nome do Produto" placeholder="Ex: Camiseta Básica Branca" {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
           </div>
           <div className="col-span-2 flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Descrição</label>
@@ -165,7 +165,7 @@ export default function Produtos() {
               className="px-3 py-2 bg-[#161616] border border-[#2a2a2a] rounded-lg text-sm text-white placeholder-[#444] outline-none focus:border-indigo-600 transition-colors resize-none"
             />
           </div>
-          <Input label="Preço de Venda (R$)" type="number" step="0.01" placeholder="99.90" {...register('preco', { required: 'Obrigatório' })} error={errors.preco?.message} />
+          <Input label="Preço de Venda (R$)" type="number" step="0.01" placeholder="99.90" {...register('preco', { required: 'Obrigatório' })} error={errors.preco?.message} isValid={!!dirtyFields.preco && !errors.preco} />
           <Input label="Custo (R$)" type="number" step="0.01" placeholder="45.00" {...register('precoCusto')} />
           <Input label="Estoque Total" type="number" placeholder="0" {...register('estoqueTotal')} />
           <Input label="Referência/SKU" placeholder="CAM-001-BR" {...register('referencia')} />

@@ -23,21 +23,21 @@ export default function Sidebar() {
 
   return (
     <aside
-      style={{ width: collapsed ? 64 : 224 }}
-      className="relative flex flex-col h-screen bg-[var(--bg-card)] border-r border-[var(--border)] transition-all duration-200 shrink-0"
+      style={{ width: collapsed ? 72 : 256 }}
+      className="relative flex flex-col h-screen bg-[var(--bg-card)] border-r border-[var(--border)] transition-all duration-300 shrink-0"
     >
       {/* Logo */}
-      <div className={`flex items-center border-b border-[var(--border)] py-5 ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'}`}>
-        <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-          <Store size={16} className="text-white" />
+      <div className={`flex items-center border-b border-[var(--border)] py-6 ${collapsed ? 'justify-center px-0' : 'gap-3 px-5'}`}>
+        <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/30">
+          <Store size={18} className="text-white" />
         </div>
         {!collapsed && (
-          <span className="font-semibold text-sm text-white tracking-wide">StyleStore</span>
+          <span className="font-semibold text-base text-white tracking-wide">StyleStore</span>
         )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 px-2 flex flex-col gap-0.5 overflow-y-auto">
+      <nav className="flex-1 py-5 px-3 flex flex-col gap-1 overflow-y-auto">
         {navItems.map(({ path, icon: Icon, label }) => {
           const active = path === '/'
             ? location.pathname === '/'
@@ -47,17 +47,17 @@ export default function Sidebar() {
             <NavLink
               key={path}
               to={path}
-              title={label}
+              title={collapsed ? label : undefined}
               className={`
-                flex items-center rounded-lg text-sm transition-all duration-150
-                ${collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2.5'}
+                flex items-center rounded-xl text-sm transition-all duration-150
+                ${collapsed ? 'justify-center px-0 py-3.5' : 'gap-3 px-4 py-3.5'}
                 ${active
                   ? 'bg-indigo-600/20 text-indigo-400 font-medium'
                   : 'text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-white'
                 }
               `}
             >
-              <Icon size={16} className="shrink-0" />
+              <Icon size={19} className="shrink-0" />
               {!collapsed && <span>{label}</span>}
             </NavLink>
           );
@@ -67,21 +67,21 @@ export default function Sidebar() {
       {/* Collapse button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-input)] flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors z-10"
+        className="absolute -right-3.5 top-[4.5rem] w-7 h-7 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-input)] flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors z-10 shadow-sm"
       >
-        {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+        {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>
 
       {/* Footer */}
-      <div className={`py-4 border-t border-[var(--border)] ${collapsed ? 'flex justify-center px-0' : 'px-3'}`}>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+      <div className={`py-5 border-t border-[var(--border)] ${collapsed ? 'flex justify-center px-0' : 'px-4'}`}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 shadow-md">
             <span className="text-xs font-bold text-white">A</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-xs font-medium text-white truncate">Admin</p>
-              <p className="text-[10px] text-[var(--text-muted)] truncate">stylestore.com</p>
+              <p className="text-sm font-medium text-white truncate">Admin</p>
+              <p className="text-xs text-[var(--text-muted)] truncate">stylestore.com</p>
             </div>
           )}
         </div>

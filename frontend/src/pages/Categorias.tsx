@@ -23,7 +23,7 @@ export default function Categorias() {
   const [editing, setEditing] = useState<Categoria | null>(null);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['categorias'], queryFn: categoriasService.getAll });
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: categoriasService.create,
@@ -113,7 +113,7 @@ export default function Categorias() {
 
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Categoria' : 'Nova Categoria'}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <Input label="Nome" placeholder="Ex: Camisetas, Vestidos..." {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} />
+          <Input label="Nome" placeholder="Ex: Camisetas, Vestidos..." {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Descrição</label>
             <textarea

@@ -25,7 +25,7 @@ export default function Funcionarios() {
   const [editing, setEditing] = useState<Funcionario | null>(null);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['funcionarios'], queryFn: funcionariosService.getAll });
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: funcionariosService.create,
@@ -123,9 +123,9 @@ export default function Funcionarios() {
 
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Funcionário' : 'Novo Funcionário'} size="lg">
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
-          <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} />
-          <Input label="CPF" placeholder="000.000.000-00" {...register('cpf', { required: 'Obrigatório' })} error={errors.cpf?.message} />
-          <Input label="E-mail" type="email" placeholder="email@loja.com" {...register('email', { required: 'Obrigatório' })} error={errors.email?.message} />
+          <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
+          <Input label="CPF" placeholder="000.000.000-00" {...register('cpf', { required: 'Obrigatório' })} error={errors.cpf?.message} isValid={!!dirtyFields.cpf && !errors.cpf} />
+          <Input label="E-mail" type="email" placeholder="email@loja.com" {...register('email', { required: 'Obrigatório' })} error={errors.email?.message} isValid={!!dirtyFields.email && !errors.email} />
           <Input label="Telefone" placeholder="(11) 99999-9999" {...register('telefone')} />
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Cargo</label>
@@ -137,8 +137,8 @@ export default function Funcionarios() {
               {cargos.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <Input label="Salário (R$)" type="number" step="0.01" placeholder="2500.00" {...register('salario', { required: 'Obrigatório' })} error={errors.salario?.message} />
-          <Input label="Data de Admissão" type="date" {...register('dataAdmissao', { required: 'Obrigatório' })} error={errors.dataAdmissao?.message} />
+          <Input label="Salário (R$)" type="number" step="0.01" placeholder="2500.00" {...register('salario', { required: 'Obrigatório' })} error={errors.salario?.message} isValid={!!dirtyFields.salario && !errors.salario} />
+          <Input label="Data de Admissão" type="date" {...register('dataAdmissao', { required: 'Obrigatório' })} error={errors.dataAdmissao?.message} isValid={!!dirtyFields.dataAdmissao && !errors.dataAdmissao} />
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#888]">Status</label>
             <select {...register('ativo')} className="h-9 px-3 bg-[#161616] border border-[#2a2a2a] rounded-lg text-sm text-white outline-none focus:border-indigo-600 transition-colors">
