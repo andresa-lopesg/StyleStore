@@ -3,6 +3,7 @@ import { AlertTriangle, Package, TrendingDown, CheckCircle } from 'lucide-react'
 import { produtosService } from '../services/produtos';
 import { categoriasService } from '../services/categorias';
 import Badge from '../components/ui/Badge';
+import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import type { Produto } from '../types';
 
@@ -75,7 +76,7 @@ export default function Estoque() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <PageShell title="Estoque" subtitle={`${produtos.length} produtos`}>
       {/* KPIs de estoque */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-4 flex items-center gap-4">
@@ -139,6 +140,6 @@ export default function Estoque() {
       )}
 
       <Table columns={columns} data={produtos} keyField="id" loading={isLoading} emptyMessage="Nenhum produto cadastrado." />
-    </div>
+    </PageShell>
   );
 }

@@ -23,13 +23,13 @@ export default function Sidebar() {
 
   return (
     <aside
-      style={{ width: collapsed ? 72 : 256 }}
-      className="relative flex flex-col h-screen bg-[var(--bg-card)] border-r border-[var(--border)] transition-all duration-300 shrink-0"
+      style={{ width: collapsed ? 80 : 260 }}
+      className="relative flex flex-col h-screen bg-(--bg-card) shadow-[2px_0_16px_rgba(0,0,0,0.4)] transition-all duration-300 shrink-0"
     >
       {/* Logo */}
-      <div className={`flex items-center border-b border-[var(--border)] py-6 ${collapsed ? 'justify-center px-0' : 'gap-3 px-5'}`}>
-        <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/30">
-          <Store size={18} className="text-white" />
+      <div className={`flex items-center border-b border-[var(--border)] shrink-0 ${collapsed ? 'justify-center px-0' : 'gap-3 px-5'}`} style={{ height: '72px' }}>
+        <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/30">
+          <Store size={20} className="text-white" />
         </div>
         {!collapsed && (
           <span className="font-semibold text-base text-white tracking-wide">StyleStore</span>
@@ -37,7 +37,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-5 px-3 flex flex-col gap-1 overflow-y-auto">
+      <nav className="flex-1 pb-4 px-3 flex flex-col gap-3 overflow-y-auto" style={{ paddingTop: '0.5rem' }}>
         {navItems.map(({ path, icon: Icon, label }) => {
           const active = path === '/'
             ? location.pathname === '/'
@@ -50,14 +50,14 @@ export default function Sidebar() {
               title={collapsed ? label : undefined}
               className={`
                 flex items-center rounded-xl text-sm transition-all duration-150
-                ${collapsed ? 'justify-center px-0 py-3.5' : 'gap-3 px-4 py-3.5'}
+                ${collapsed ? 'justify-center px-0 py-5' : 'gap-3.5 px-4 py-4'}
                 ${active
                   ? 'bg-indigo-600/20 text-indigo-400 font-medium'
                   : 'text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-white'
                 }
               `}
             >
-              <Icon size={19} className="shrink-0" />
+              <Icon size={22} className="shrink-0" />
               {!collapsed && <span>{label}</span>}
             </NavLink>
           );
@@ -75,8 +75,8 @@ export default function Sidebar() {
       {/* Footer */}
       <div className={`py-5 border-t border-[var(--border)] ${collapsed ? 'flex justify-center px-0' : 'px-4'}`}>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 shadow-md">
-            <span className="text-xs font-bold text-white">A</span>
+          <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 shadow-md">
+            <span className="text-sm font-bold text-white">A</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">

@@ -8,6 +8,7 @@ import { funcionariosService } from '../services/funcionarios';
 import type { Pedido, StatusPedido } from '../types';
 import { useToast } from '../context/ToastContext';
 import { StatusPedidoLabel } from '../types';
+import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -121,16 +122,11 @@ export default function Pedidos() {
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">Pedidos</h2>
-          <p className="text-xs text-[#666] mt-0.5">
-            {data.filter(p => p.status === 0).length} pendentes · {data.length} total
-          </p>
-        </div>
-        <Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Pedido</Button>
-      </div>
+    <PageShell
+      title="Pedidos"
+      subtitle={`${data.filter(p => p.status === 0).length} pendentes · ${data.length} total`}
+      action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Pedido</Button>}
+    >
 
       <div className="relative w-72">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
@@ -238,6 +234,6 @@ export default function Pedidos() {
       </Modal>
 
       <ConfirmDialog open={deleteId !== null} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && deleteMutation.mutate(deleteId)} loading={deleteMutation.isPending} />
-    </div>
+    </PageShell>
   );
 }

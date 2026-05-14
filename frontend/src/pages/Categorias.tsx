@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { categoriasService } from '../services/categorias';
 import type { Categoria } from '../types';
 import { useToast } from '../context/ToastContext';
+import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -91,14 +92,11 @@ export default function Categorias() {
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">Categorias</h2>
-          <p className="text-xs text-[#666] mt-0.5">{data.filter(c => c.ativa).length} ativas de {data.length} total</p>
-        </div>
-        <Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Nova Categoria</Button>
-      </div>
+    <PageShell
+      title="Categorias"
+      subtitle={`${data.filter(c => c.ativa).length} ativas de ${data.length} total`}
+      action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Nova Categoria</Button>}
+    >
 
       <div className="relative w-72">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
@@ -140,6 +138,6 @@ export default function Categorias() {
       </Modal>
 
       <ConfirmDialog open={deleteId !== null} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && deleteMutation.mutate(deleteId)} loading={deleteMutation.isPending} />
-    </div>
+    </PageShell>
   );
 }

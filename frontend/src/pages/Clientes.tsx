@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { clientesService } from '../services/clientes';
 import type { Cliente } from '../types';
 import { useToast } from '../context/ToastContext';
+import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -74,14 +75,11 @@ export default function Clientes() {
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">Clientes</h2>
-          <p className="text-xs text-[#666] mt-0.5">{data.length} cliente{data.length !== 1 ? 's' : ''} cadastrado{data.length !== 1 ? 's' : ''}</p>
-        </div>
-        <Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Cliente</Button>
-      </div>
+    <PageShell
+      title="Clientes"
+      subtitle={`${data.length} cliente${data.length !== 1 ? 's' : ''} cadastrado${data.length !== 1 ? 's' : ''}`}
+      action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Cliente</Button>}
+    >
 
       <div className="relative w-72">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
@@ -115,6 +113,6 @@ export default function Clientes() {
         loading={deleteMutation.isPending}
         message="Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita."
       />
-    </div>
+    </PageShell>
   );
 }

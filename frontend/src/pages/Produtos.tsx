@@ -6,6 +6,7 @@ import { produtosService } from '../services/produtos';
 import { categoriasService } from '../services/categorias';
 import type { Produto } from '../types';
 import { useToast } from '../context/ToastContext';
+import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -126,19 +127,11 @@ export default function Produtos() {
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">Produtos</h2>
-          <p className="text-xs text-[#666] mt-0.5">
-            {data.filter(p => p.ativo).length} ativos
-            {data.filter(p => p.estoqueTotal < 10).length > 0 && (
-              <span className="text-yellow-400 ml-2">· {data.filter(p => p.estoqueTotal < 10).length} com estoque baixo</span>
-            )}
-          </p>
-        </div>
-        <Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Produto</Button>
-      </div>
+    <PageShell
+      title="Produtos"
+      subtitle={<>{data.filter(p => p.ativo).length} ativos{data.filter(p => p.estoqueTotal < 10).length > 0 && <span className="text-yellow-400 ml-2">· {data.filter(p => p.estoqueTotal < 10).length} com estoque baixo</span>}</>}
+      action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Produto</Button>}
+    >
 
       <div className="relative w-72">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
@@ -197,6 +190,6 @@ export default function Produtos() {
       </Modal>
 
       <ConfirmDialog open={deleteId !== null} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && deleteMutation.mutate(deleteId)} loading={deleteMutation.isPending} />
-    </div>
+    </PageShell>
   );
 }

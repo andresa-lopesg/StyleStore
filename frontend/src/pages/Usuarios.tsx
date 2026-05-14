@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { usuariosService } from '../services/usuarios';
 import type { Usuario } from '../types';
 import { useToast } from '../context/ToastContext';
+import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -85,14 +86,11 @@ export default function Usuarios() {
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">Usuários</h2>
-          <p className="text-xs text-[#666] mt-0.5">{data.length} usuário{data.length !== 1 ? 's' : ''}</p>
-        </div>
-        <Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Usuário</Button>
-      </div>
+    <PageShell
+      title="Usuários"
+      subtitle={`${data.length} usuário${data.length !== 1 ? 's' : ''}`}
+      action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Usuário</Button>}
+    >
 
       <div className="relative w-72">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
@@ -120,6 +118,6 @@ export default function Usuarios() {
       </Modal>
 
       <ConfirmDialog open={deleteId !== null} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && deleteMutation.mutate(deleteId)} loading={deleteMutation.isPending} />
-    </div>
+    </PageShell>
   );
 }
