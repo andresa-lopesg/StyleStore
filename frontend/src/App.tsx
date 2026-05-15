@@ -11,6 +11,9 @@ import Produtos from './pages/Produtos';
 import Pedidos from './pages/Pedidos';
 import Producao from './pages/Producao';
 import Estoque from './pages/Estoque';
+import Colecoes from './pages/Colecoes';
+import Movimentacoes from './pages/Movimentacoes';
+import Configuracoes from './pages/Configuracoes';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +37,9 @@ export default function App() {
               <Route path="/pedidos" element={<Pedidos />} />
               <Route path="/producao" element={<Producao />} />
               <Route path="/estoque" element={<Estoque />} />
+              <Route path="/colecoes" element={<Colecoes />} />
+              <Route path="/movimentacoes" element={<Movimentacoes />} />
+              <Route path="/configuracoes" element={<Configuracoes />} />
             </Route>
           </Routes>
         </ToastProvider>

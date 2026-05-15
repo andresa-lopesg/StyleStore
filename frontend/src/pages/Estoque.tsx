@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, Package, TrendingDown, CheckCircle } from 'lucide-react';
+import { AlertTriangle, Package, TrendingDown, CheckCircle, Boxes } from 'lucide-react';
 import { produtosService } from '../services/produtos';
 import { categoriasService } from '../services/categorias';
 import Badge from '../components/ui/Badge';
+import Surface from '../components/ui/Surface';
 import PageShell from '../components/layout/PageShell';
 import Table from '../components/ui/Table';
 import type { Produto } from '../types';
+import EmptyState from '../components/ui/EmptyState';
 
 export default function Estoque() {
   const { data: produtos = [], isLoading } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
@@ -26,19 +28,19 @@ export default function Estoque() {
       key: 'nome', header: 'Produto',
       render: (row: Produto) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center">
-            <Package size={13} className="text-[#555]" />
+          <div className="w-8 h-8 rounded-lg bg-(--bg-hover) border border-(--border-input) flex items-center justify-center">
+            <Package size={13} className="text-(--text-muted)" />
           </div>
           <div>
             <p className="text-white text-sm font-medium">{row.nome}</p>
-            {row.referencia && <p className="text-[10px] text-[#555]">{row.referencia}</p>}
+            {row.referencia && <p className="text-xs text-(--text-muted)">{row.referencia}</p>}
           </div>
         </div>
       ),
     },
     {
       key: 'categoria', header: 'Categoria',
-      render: (row: Produto) => row.categoria ? <Badge color="indigo">{row.categoria.nome}</Badge> : <span className="text-[#555]">—</span>,
+      render: (row: Produto) => row.categoria ? <Badge color="indigo">{row.categoria.nome}</Badge> : <span className="text-(--text-muted)">—</span>,
     },
     {
       key: 'estoqueTotal', header: 'Estoque',
@@ -58,13 +60,13 @@ export default function Estoque() {
         const pct = (row.estoqueTotal / max) * 100;
         return (
           <div className="flex items-center gap-2">
-            <div className="w-24 h-1.5 bg-[#1e1e1e] rounded-full overflow-hidden">
+            <div className="w-24 h-1.5 bg-(--bg-hover) rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${row.estoqueTotal === 0 ? 'bg-red-500' : row.estoqueTotal < 10 ? 'bg-yellow-500' : 'bg-green-500'}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="text-[10px] text-[#555]">{Math.round(pct)}%</span>
+            <span className="text-xs text-(--text-muted)">{Math.round(pct)}%</span>
           </div>
         );
       },
@@ -79,33 +81,33 @@ export default function Estoque() {
     <PageShell title="Estoque" subtitle={`${produtos.length} produtos`}>
       {/* KPIs de estoque */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-4 flex items-center gap-4">
+        <Surface padding="sm" className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-red-600/20 flex items-center justify-center">
             <TrendingDown size={18} className="text-red-400" />
           </div>
           <div>
             <p className="text-xl font-semibold text-white">{semEstoque.length}</p>
-            <p className="text-xs text-[#666]">Sem estoque</p>
+            <p className="text-xs text-(--text-muted)">Sem estoque</p>
           </div>
-        </div>
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-4 flex items-center gap-4">
+        </Surface>
+        <Surface padding="sm" className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-yellow-600/20 flex items-center justify-center">
             <AlertTriangle size={18} className="text-yellow-400" />
           </div>
           <div>
             <p className="text-xl font-semibold text-white">{estoqueBaixo.length}</p>
-            <p className="text-xs text-[#666]">Estoque baixo (&lt;10)</p>
+            <p className="text-xs text-(--text-muted)">Estoque baixo (&lt;10)</p>
           </div>
-        </div>
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-4 flex items-center gap-4">
+        </Surface>
+        <Surface padding="sm" className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center">
             <CheckCircle size={18} className="text-green-400" />
           </div>
           <div>
             <p className="text-xl font-semibold text-white">{estoqueOk.length}</p>
-            <p className="text-xs text-[#666]">Estoque OK</p>
+            <p className="text-xs text-(--text-muted)">Estoque OK</p>
           </div>
-        </div>
+        </Surface>
       </div>
 
       {/* Filtros por categoria */}
@@ -114,7 +116,7 @@ export default function Estoque() {
         {categorias.map(cat => {
           const count = produtos.filter(p => p.categoriaId === cat.id).length;
           return (
-            <span key={cat.id} className="px-2.5 py-1 rounded-lg bg-[#161616] border border-[#2a2a2a] text-xs text-[#888]">
+            <span key={cat.id} className="px-2.5 py-1 rounded-lg bg-(--bg-elevated) border border-(--border-input) text-xs text-(--text-secondary)">
               {cat.nome} <span className="text-indigo-400 ml-1">{count}</span>
             </span>
           );
@@ -133,13 +135,16 @@ export default function Estoque() {
               <span key={p.id} className="px-2 py-0.5 rounded bg-yellow-500/10 text-xs text-yellow-400">{p.nome}</span>
             ))}
             {(semEstoque.length + estoqueBaixo.length) > 6 && (
-              <span className="text-xs text-[#666]">+{(semEstoque.length + estoqueBaixo.length) - 6} mais</span>
+              <span className="text-xs text-(--text-muted)">+{(semEstoque.length + estoqueBaixo.length) - 6} mais</span>
             )}
           </div>
         </div>
       )}
 
-      <Table columns={columns} data={produtos} keyField="id" loading={isLoading} emptyMessage="Nenhum produto cadastrado." />
+      <Table
+        columns={columns} data={produtos} keyField="id" loading={isLoading} pageSize={20}
+        emptyState={<EmptyState icon={Boxes} title="Nenhum produto no estoque" description="Nenhum produto foi cadastrado ainda." />}
+      />
     </PageShell>
   );
 }

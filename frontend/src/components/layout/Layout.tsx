@@ -9,8 +9,10 @@ export default function Layout() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar />
-        <main key={location.pathname} className="flex-1 overflow-y-auto p-6 animate-page-enter">
-          <Outlet />
+        <main key={location.pathname} className="flex-1 overflow-y-auto p-4 lg:p-6 animate-page-enter">
+          <div className="max-w-screen-2xl mx-auto w-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

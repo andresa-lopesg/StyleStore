@@ -1,5 +1,11 @@
-import { Bell, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { produtosService } from '../../services/produtos';
+import { pedidosService } from '../../services/pedidos';
+import NotificationDropdown from '../ui/NotificationDropdown';
+import CommandPalette from '../ui/CommandPalette';
+import { useCommandPalette } from '../../hooks/useCommandPalette';
 
 const titles: Record<string, string> = {
   '/': 'Dashboard',
@@ -15,27 +21,33 @@ const titles: Record<string, string> = {
 
 export default function TopBar() {
   const location = useLocation();
+  const { isOpen, open, close } = useCommandPalette();
   const title = Object.entries(titles).find(([path]) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
   )?.[1] ?? 'StyleStore';
+
+  const { data: produtos = [] } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll, staleTime: 30_000 });
+  const { data: pedidos = [] } = useQuery({ queryKey: ['pedidos'], queryFn: pedidosService.getAll, staleTime: 30_000 });
+
+  const semEstoque = produtos.filter(p => p.estoqueTotal === 0);
+  const estoqueBaixo = produtos.filter(p => p.estoqueTotal > 0 && p.estoqueTotal < 10);
+  const pedidosPendentes = pedidos.filter(p => p.status === 0);
 
   return (
     <header className="h-14 flex items-center justify-between px-6 border-b border-[var(--border)] bg-[var(--bg-base)] shrink-0">
       <h1 className="text-sm font-semibold text-white">{title}</h1>
       <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-          <input
-            type="text"
-            placeholder="Buscar..."
-            className="bg-[var(--bg-elevated)] border border-[var(--border-input)] rounded-lg pl-8 pr-4 py-1.5 text-xs text-[var(--text-secondary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors w-48"
-          />
-        </div>
-        <button className="relative w-8 h-8 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-input)] flex items-center justify-center text-[var(--text-secondary)] hover:text-white transition-colors">
-          <Bell size={14} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500" />
+        <button
+          onClick={open}
+          className="flex items-center gap-2 bg-(--bg-elevated) border border-(--border-input) rounded-lg px-3 py-1.5 text-xs text-(--text-muted) hover:border-(--accent) transition-colors w-48"
+        >
+          <Search size={13} className="shrink-0" />
+          <span className="flex-1 text-left">Buscar...</span>
+          <kbd className="text-[10px] bg-(--bg-hover) px-1.5 py-0.5 rounded border border-(--border) shrink-0">⌘K</kbd>
         </button>
+        <NotificationDropdown semEstoque={semEstoque} estoqueBaixo={estoqueBaixo} pedidosPendentes={pedidosPendentes} />
       </div>
+      <CommandPalette open={isOpen} onClose={close} />
     </header>
   );
 }

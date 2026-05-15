@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, MoreVertical, Users, SearchX } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { clientesService } from '../services/clientes';
 import type { Cliente } from '../types';
@@ -10,7 +10,10 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import SearchInput from '../components/ui/SearchInput';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
+import DropdownMenu from '../components/ui/DropdownMenu';
+import EmptyState from '../components/ui/EmptyState';
 
 type FormData = Omit<Cliente, 'id'>;
 
@@ -64,12 +67,15 @@ export default function Clientes() {
     { key: 'email', header: 'E-mail' },
     { key: 'telefone', header: 'Telefone' },
     {
-      key: 'acoes', header: 'Ações', width: '100px',
+      key: 'acoes', header: 'Ações', width: '60px',
       render: (row: Cliente) => (
-        <div className="flex gap-1">
-          <Button size="sm" variant="ghost" icon={<Pencil size={12} />} onClick={() => openEdit(row)} />
-          <Button size="sm" variant="danger" icon={<Trash2 size={12} />} onClick={() => setDeleteId(row.id)} />
-        </div>
+        <DropdownMenu
+          trigger={<Button size="sm" variant="ghost" icon={<MoreVertical size={14} />} ariaLabel="Ações" />}
+          items={[
+            { label: 'Editar', icon: <Pencil size={13} />, onClick: () => openEdit(row) },
+            { label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(row.id), variant: 'danger' },
+          ]}
+        />
       ),
     },
   ];
@@ -81,16 +87,15 @@ export default function Clientes() {
       action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Cliente</Button>}
     >
 
-      <div className="relative w-72">
-        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar cliente..."
-          className="w-full h-9 pl-8 pr-3 bg-[#111] border border-[#2a2a2a] rounded-lg text-sm text-[#ccc] placeholder-[#444] outline-none focus:border-indigo-600 transition-colors"
-        />
-      </div>
+      <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." />
 
-      <Table columns={columns} data={filtered} keyField="id" loading={isLoading} emptyMessage="Nenhum cliente encontrado." />
+      <Table
+        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        emptyState={search
+          ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhum cliente encontrado para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
+          : <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Adicione o primeiro cliente para começar." action={{ label: 'Adicionar cliente', onClick: openCreate }} />
+        }
+      />
 
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Cliente' : 'Novo Cliente'}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

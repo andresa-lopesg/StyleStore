@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, MoreVertical, UserCheck, SearchX } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { funcionariosService } from '../services/funcionarios';
 import type { Funcionario } from '../types';
@@ -10,8 +10,12 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import SearchInput from '../components/ui/SearchInput';
+import Select from '../components/ui/Select';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import Badge from '../components/ui/Badge';
+import DropdownMenu from '../components/ui/DropdownMenu';
+import EmptyState from '../components/ui/EmptyState';
 
 type FormData = Omit<Funcionario, 'id' | 'criadoEm'>;
 
@@ -91,12 +95,15 @@ export default function Funcionarios() {
       render: (row: Funcionario) => <Badge color={row.ativo ? 'green' : 'red'}>{row.ativo ? 'Ativo' : 'Inativo'}</Badge>,
     },
     {
-      key: 'acoes', header: 'Ações', width: '100px',
+      key: 'acoes', header: 'Ações', width: '60px',
       render: (row: Funcionario) => (
-        <div className="flex gap-1">
-          <Button size="sm" variant="ghost" icon={<Pencil size={12} />} onClick={() => openEdit(row)} />
-          <Button size="sm" variant="danger" icon={<Trash2 size={12} />} onClick={() => setDeleteId(row.id)} />
-        </div>
+        <DropdownMenu
+          trigger={<Button size="sm" variant="ghost" icon={<MoreVertical size={14} />} ariaLabel="Ações" />}
+          items={[
+            { label: 'Editar', icon: <Pencil size={13} />, onClick: () => openEdit(row) },
+            { label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(row.id), variant: 'danger' },
+          ]}
+        />
       ),
     },
   ];
@@ -108,43 +115,33 @@ export default function Funcionarios() {
       action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Funcionário</Button>}
     >
 
-      <div className="relative w-72">
-        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar funcionário..."
-          className="w-full h-9 pl-8 pr-3 bg-[#111] border border-[#2a2a2a] rounded-lg text-sm text-[#ccc] placeholder-[#444] outline-none focus:border-indigo-600 transition-colors"
-        />
-      </div>
+      <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar funcionário..." />
 
-      <Table columns={columns} data={filtered} keyField="id" loading={isLoading} />
+      <Table
+        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        emptyState={search
+          ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhum funcionário encontrado para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
+          : <EmptyState icon={UserCheck} title="Nenhum funcionário cadastrado" description="Cadastre o primeiro funcionário para começar." action={{ label: 'Adicionar funcionário', onClick: openCreate }} />
+        }
+      />
 
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Funcionário' : 'Novo Funcionário'} size="lg">
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
           <Input label="CPF" placeholder="000.000.000-00" {...register('cpf', { required: 'Obrigatório' })} error={errors.cpf?.message} isValid={!!dirtyFields.cpf && !errors.cpf} />
           <Input label="E-mail" type="email" placeholder="email@loja.com" {...register('email', { required: 'Obrigatório' })} error={errors.email?.message} isValid={!!dirtyFields.email && !errors.email} />
           <Input label="Telefone" placeholder="(11) 99999-9999" {...register('telefone')} />
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#888]">Cargo</label>
-            <select
-              {...register('cargo', { required: 'Obrigatório' })}
-              className="h-9 px-3 bg-[#161616] border border-[#2a2a2a] rounded-lg text-sm text-white outline-none focus:border-indigo-600 transition-colors"
-            >
-              <option value="">Selecione...</option>
-              {cargos.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
+          <Select label="Cargo" {...register('cargo', { required: 'Obrigatório' })} error={errors.cargo?.message}>
+            <option value="">Selecione...</option>
+            {cargos.map(c => <option key={c} value={c}>{c}</option>)}
+          </Select>
           <Input label="Salário (R$)" type="number" step="0.01" placeholder="2500.00" {...register('salario', { required: 'Obrigatório' })} error={errors.salario?.message} isValid={!!dirtyFields.salario && !errors.salario} />
           <Input label="Data de Admissão" type="date" {...register('dataAdmissao', { required: 'Obrigatório' })} error={errors.dataAdmissao?.message} isValid={!!dirtyFields.dataAdmissao && !errors.dataAdmissao} />
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#888]">Status</label>
-            <select {...register('ativo')} className="h-9 px-3 bg-[#161616] border border-[#2a2a2a] rounded-lg text-sm text-white outline-none focus:border-indigo-600 transition-colors">
-              <option value="true">Ativo</option>
-              <option value="false">Inativo</option>
-            </select>
-          </div>
-          <div className="col-span-2 flex justify-end gap-2 pt-2 border-t border-[#1e1e1e]">
+          <Select label="Status" {...register('ativo')}>
+            <option value="true">Ativo</option>
+            <option value="false">Inativo</option>
+          </Select>
+          <div className="col-span-2 flex justify-end gap-2 pt-2 border-t border-(--border)">
             <Button type="button" variant="secondary" onClick={closeModal}>Cancelar</Button>
             <Button type="submit" variant="primary" loading={createMutation.isPending || updateMutation.isPending}>
               {editing ? 'Salvar' : 'Criar'}
