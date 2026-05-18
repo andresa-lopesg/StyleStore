@@ -33,7 +33,7 @@ export default function NotificationDropdown({ semEstoque, estoqueBaixo, pedidos
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative w-8 h-8 rounded-lg bg-(--bg-elevated) border border-(--border-input) flex items-center justify-center text-(--text-secondary) hover:text-white transition-colors"
+        className="relative w-8 h-8 rounded-lg bg-(--bg-elevated) border border-(--border-input) flex items-center justify-center text-(--text-secondary) hover:text-(--text-primary) transition-colors"
       >
         <Bell size={14} />
         {totalAlertas > 0 && (
@@ -46,7 +46,7 @@ export default function NotificationDropdown({ semEstoque, estoqueBaixo, pedidos
       {open && (
         <div className="absolute right-0 top-10 z-50 w-80 bg-(--bg-card) border border-(--border-input) rounded-xl shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
-            <span className="text-sm font-semibold text-white">Notificações</span>
+            <span className="text-sm font-semibold text-(--text-primary)">Notificações</span>
             <span className="text-xs text-(--text-muted)">{totalAlertas}</span>
           </div>
 
@@ -58,7 +58,7 @@ export default function NotificationDropdown({ semEstoque, estoqueBaixo, pedidos
                 <button onClick={() => go('/produtos')} className="flex items-start gap-3 px-4 py-3 text-left hover:bg-(--bg-hover) transition-colors w-full">
                   <span className="text-base mt-0.5">🔴</span>
                   <div>
-                    <p className="text-sm text-white font-medium">{semEstoque.length} produto{semEstoque.length > 1 ? 's' : ''} sem estoque</p>
+                    <p className="text-sm text-(--text-primary) font-medium">{semEstoque.length} produto{semEstoque.length > 1 ? 's' : ''} sem estoque</p>
                     <p className="text-xs text-(--text-muted) mt-0.5">
                       {semEstoque[0].nome}{semEstoque.length > 1 ? ` e +${semEstoque.length - 1}` : ''} →
                     </p>
@@ -69,7 +69,7 @@ export default function NotificationDropdown({ semEstoque, estoqueBaixo, pedidos
                 <button onClick={() => go('/estoque')} className="flex items-start gap-3 px-4 py-3 text-left hover:bg-(--bg-hover) transition-colors w-full">
                   <span className="text-base mt-0.5">🟡</span>
                   <div>
-                    <p className="text-sm text-white font-medium">{estoqueBaixo.length} com estoque baixo</p>
+                    <p className="text-sm text-(--text-primary) font-medium">{estoqueBaixo.length} com estoque baixo</p>
                     <p className="text-xs text-(--text-muted) mt-0.5">Ver todos no Estoque →</p>
                   </div>
                 </button>
@@ -78,7 +78,7 @@ export default function NotificationDropdown({ semEstoque, estoqueBaixo, pedidos
                 <button onClick={() => go('/pedidos')} className="flex items-start gap-3 px-4 py-3 text-left hover:bg-(--bg-hover) transition-colors w-full">
                   <span className="text-base mt-0.5">🟠</span>
                   <div>
-                    <p className="text-sm text-white font-medium">{pedidosPendentes.length} pedido{pedidosPendentes.length > 1 ? 's' : ''} pendente{pedidosPendentes.length > 1 ? 's' : ''}</p>
+                    <p className="text-sm text-(--text-primary) font-medium">{pedidosPendentes.length} pedido{pedidosPendentes.length > 1 ? 's' : ''} pendente{pedidosPendentes.length > 1 ? 's' : ''}</p>
                     <p className="text-xs text-(--text-muted) mt-0.5">Ver todos em Pedidos →</p>
                   </div>
                 </button>

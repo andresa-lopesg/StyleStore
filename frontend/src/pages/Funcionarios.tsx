@@ -87,7 +87,7 @@ export default function Funcionarios() {
     {
       key: 'salario', header: 'Salário',
       render: (row: Funcionario) => (
-        <span className="text-green-400 font-medium">R$ {Number(row.salario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+        <span className="text-(--c-green) font-medium">R$ {Number(row.salario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
       ),
     },
     {
@@ -118,7 +118,7 @@ export default function Funcionarios() {
       <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar funcionário..." />
 
       <Table
-        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
         emptyState={search
           ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhum funcionário encontrado para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
           : <EmptyState icon={UserCheck} title="Nenhum funcionário cadastrado" description="Cadastre o primeiro funcionário para começar." action={{ label: 'Adicionar funcionário', onClick: openCreate }} />

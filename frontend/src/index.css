@@ -20,6 +20,15 @@
   /* Accent */
   --accent:   #6366f1;
   --accent-2: #8b5cf6;
+
+  /* Cores semânticas (adaptam ao tema) */
+  --c-green:  #4ade80;
+  --c-yellow: #facc15;
+  --c-red:    #f87171;
+  --c-blue:   #60a5fa;
+  --c-purple: #c084fc;
+  --c-cyan:   #22d3ee;
+  --c-indigo: #818cf8;
 }
 
 * {
@@ -116,9 +125,46 @@ body {
   border-radius: 4px;
 }
 
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 240ms ease,
+    color 200ms ease,
+    border-color 200ms ease,
+    fill 200ms ease,
+    stroke 200ms ease !important;
+  transition-delay: 0s !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+[data-theme="light"] {
+  --bg-base:          #f4f4f8;
+  --bg-card:          #ffffff;
+  --bg-elevated:      #f0f0f5;
+  --bg-hover:         #e8e8f0;
+  --border:           #e0e0ea;
+  --border-input:     #d0d0de;
+  --text-primary:     #0f0f1a;
+  --text-secondary:   #5a5a78;
+  --text-muted:       #9090a8;
+  --text-placeholder: #b0b0c4;
+  --accent:           #6366f1;
+  --accent-2:         #8b5cf6;
+
+  /* Cores semânticas — versão clara (maior contraste) */
+  --c-green:  #16a34a;
+  --c-yellow: #a16207;
+  --c-red:    #dc2626;
+  --c-blue:   #1d4ed8;
+  --c-purple: #7e22ce;
+  --c-cyan:   #0e7490;
+  --c-indigo: #4338ca;
 }

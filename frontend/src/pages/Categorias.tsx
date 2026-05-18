@@ -70,9 +70,9 @@ export default function Categorias() {
       render: (row: Categoria) => (
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-md bg-indigo-600/20 flex items-center justify-center">
-            <Tag size={12} className="text-indigo-400" />
+            <Tag size={12} className="text-(--c-indigo)" />
           </div>
-          <span className="text-white font-medium">{row.nome}</span>
+          <span className="text-(--text-primary) font-medium">{row.nome}</span>
         </div>
       ),
     },
@@ -109,7 +109,7 @@ export default function Categorias() {
       <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar categoria..." />
 
       <Table
-        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
         emptyState={search
           ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhuma categoria encontrada para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
           : <EmptyState icon={Tag} title="Nenhuma categoria criada" description="Crie a primeira categoria para organizar os produtos." action={{ label: 'Criar categoria', onClick: openCreate }} />

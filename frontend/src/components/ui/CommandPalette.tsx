@@ -104,7 +104,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Buscar clientes, produtos, pedidos..."
-            className="flex-1 bg-transparent text-sm text-white placeholder-[var(--text-muted)] outline-none"
+            className="flex-1 bg-transparent text-sm text-(--text-primary) placeholder-[var(--text-muted)] outline-none"
           />
           <kbd className="text-xs text-(--text-muted) bg-(--bg-elevated) px-1.5 py-0.5 rounded border border-(--border) shrink-0">Esc</kbd>
         </div>
@@ -134,7 +134,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       onClick={() => { navigate('/clientes'); onClose(); }}
                       onHover={() => setSelectedIndex(clienteStart + i)}
                     >
-                      <span className="text-white truncate">{c.nome}</span>
+                      <span className="text-(--text-primary) truncate">{c.nome}</span>
                       <span className="text-(--text-muted) text-xs ml-auto shrink-0">{c.email}</span>
                     </ResultRow>
                   ))}
@@ -151,7 +151,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       onClick={() => { navigate('/produtos'); onClose(); }}
                       onHover={() => setSelectedIndex(produtoStart + i)}
                     >
-                      <span className="text-white truncate">{p.nome}</span>
+                      <span className="text-(--text-primary) truncate">{p.nome}</span>
                       {p.referencia && <span className="text-(--text-muted) text-xs">{p.referencia}</span>}
                       <span className="text-(--text-muted) text-xs ml-auto shrink-0">
                         R$ {p.preco.toFixed(2).replace('.', ',')}
@@ -171,7 +171,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       onClick={() => { navigate('/pedidos'); onClose(); }}
                       onHover={() => setSelectedIndex(pedidoStart + i)}
                     >
-                      <span className="text-white">Pedido #{String(p.id).padStart(4, '0')}</span>
+                      <span className="text-(--text-primary)">Pedido #{String(p.id).padStart(4, '0')}</span>
                       {p.cliente && (
                         <span className="text-(--text-muted) text-xs">
                           {p.cliente.nome} · {StatusPedidoLabel[p.status]}
@@ -192,7 +192,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       onClick={() => { navigate('/funcionarios'); onClose(); }}
                       onHover={() => setSelectedIndex(funcionarioStart + i)}
                     >
-                      <span className="text-white truncate">{f.nome}</span>
+                      <span className="text-(--text-primary) truncate">{f.nome}</span>
                       <span className="text-(--text-muted) text-xs ml-auto shrink-0">{f.cargo}</span>
                     </ResultRow>
                   ))}

@@ -24,7 +24,7 @@ export default function StatCard({ title, value, subtitle, icon, delta, sparklin
     );
   }
 
-  const sparkColor = (delta ?? 0) >= 0 ? '#4ade80' : '#f87171';
+  const sparkColor = (delta ?? 0) >= 0 ? 'var(--c-green)' : 'var(--c-red)';
 
   return (
     <div className={base}>
@@ -33,7 +33,7 @@ export default function StatCard({ title, value, subtitle, icon, delta, sparklin
         {icon}
       </div>
       <div className="flex items-end justify-between gap-2">
-        <p className="text-2xl font-semibold text-white">{value}</p>
+        <p className="text-2xl font-semibold text-(--text-primary)">{value}</p>
         {sparklineData && (
           <LineChart width={80} height={32} data={sparklineData}>
             <Line type="monotone" dataKey="v" stroke={sparkColor} strokeWidth={1.5} dot={false} isAnimationActive={false} />
@@ -42,7 +42,7 @@ export default function StatCard({ title, value, subtitle, icon, delta, sparklin
       </div>
       <div>
         {delta !== undefined && (
-          <div className={`flex items-center gap-1 text-xs ${delta > 0 ? 'text-green-400' : delta < 0 ? 'text-red-400' : 'text-(--text-muted)'}`}>
+          <div className={`flex items-center gap-1 text-xs ${delta > 0 ? 'text-(--c-green)' : delta < 0 ? 'text-(--c-red)' : 'text-(--text-muted)'}`}>
             {delta > 0 ? <ArrowUpRight size={12} /> : delta < 0 ? <ArrowDownRight size={12} /> : <Minus size={12} />}
             <span>{Math.abs(delta)}%</span>
           </div>

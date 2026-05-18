@@ -17,6 +17,7 @@ interface TableProps<T> {
   emptyMessage?: string;
   emptyState?: React.ReactNode;
   pageSize?: number;
+  noPagination?: boolean;
   selectable?: boolean;
   selectedIds?: (string | number)[];
   onSelectionChange?: (ids: (string | number)[]) => void;
@@ -51,6 +52,7 @@ export default function Table<T>({
   emptyMessage = 'Nenhum registro encontrado.',
   emptyState,
   pageSize,
+  noPagination,
   selectable,
   selectedIds = [],
   onSelectionChange,
@@ -92,7 +94,7 @@ export default function Table<T>({
     : data;
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / perPage));
-  const displayed = sorted.slice(page * perPage, (page + 1) * perPage);
+  const displayed = noPagination ? sorted : sorted.slice(page * perPage, (page + 1) * perPage);
 
   const pageNumbers = (): number[] => {
     if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i);
@@ -146,7 +148,7 @@ export default function Table<T>({
                   key={col.key}
                   style={col.width ? { width: col.width } : undefined}
                   onClick={col.sortable ? () => handleSort(col.key) : undefined}
-                  className={`px-4 py-3 text-left text-xs font-medium text-(--text-muted) uppercase tracking-wider bg-(--bg-card) ${col.sortable ? 'cursor-pointer select-none hover:text-white transition-colors' : ''}`}
+                  className={`px-4 py-3.5 text-left text-xs font-medium text-(--text-muted) uppercase tracking-wider bg-(--bg-card) ${col.sortable ? 'cursor-pointer select-none hover:text-(--text-primary) transition-colors' : ''}`}
                 >
                   <div className="flex items-center gap-1.5">
                     {col.header}
@@ -166,9 +168,9 @@ export default function Table<T>({
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i} className="border-b border-(--border)">
-                  {selectable && <td className="px-4 py-3.5" />}
+                  {selectable && <td className="px-4 py-4" />}
                   {columns.map(col => (
-                    <td key={col.key} className="px-4 py-3.5">
+                    <td key={col.key} className="px-4 py-4">
                       <div className="h-4 shimmer rounded" style={{ width: i % 2 === 0 ? '70%' : '50%' }} />
                     </td>
                   ))}
@@ -192,7 +194,7 @@ export default function Table<T>({
                     }`}
                   >
                     {selectable && (
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-4">
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -202,7 +204,7 @@ export default function Table<T>({
                       </td>
                     )}
                     {columns.map(col => (
-                      <td key={col.key} className="px-4 py-3.5 text-(--text-secondary)">
+                      <td key={col.key} className="px-4 py-4 text-(--text-secondary)">
                         {col.render ? col.render(row) : String((row as Record<string, unknown>)[col.key] ?? '')}
                       </td>
                     ))}
@@ -214,7 +216,7 @@ export default function Table<T>({
         </table>
       </div>
 
-      {!loading && data.length > 0 && (
+      {!noPagination && !loading && data.length > 0 && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-(--border) bg-(--bg-card)">
           <div className="flex items-center gap-3">
             <span className="text-xs text-(--text-muted)">
@@ -233,7 +235,7 @@ export default function Table<T>({
               <button
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-(--text-muted) hover:text-white hover:bg-(--bg-elevated) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-elevated) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={14} />
               </button>
@@ -242,7 +244,7 @@ export default function Table<T>({
                   key={n}
                   onClick={() => setPage(n)}
                   className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
-                    n === page ? 'bg-(--accent) text-white' : 'text-(--text-muted) hover:text-white hover:bg-(--bg-elevated)'
+                    n === page ? 'bg-(--accent) text-white' : 'text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-elevated)'
                   }`}
                 >
                   {n + 1}
@@ -251,7 +253,7 @@ export default function Table<T>({
               <button
                 onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                 disabled={page >= totalPages - 1}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-(--text-muted) hover:text-white hover:bg-(--bg-elevated) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-elevated) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight size={14} />
               </button>

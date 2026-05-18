@@ -23,7 +23,7 @@ export default function Textarea({ label, error, isValid, className = '', ...pro
           ${className}
         `}
       />
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-(--c-red)">{error}</span>}
     </div>
   );
 }

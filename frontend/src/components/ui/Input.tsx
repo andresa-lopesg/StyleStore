@@ -20,7 +20,7 @@ export default function Input({ label, error, isValid, className = '', type, ...
           {...props}
           type={isPassword && showPassword ? 'text' : type}
           className={`
-            h-9 px-3 bg-[var(--bg-elevated)] border rounded-lg text-sm text-white
+            h-9 px-3 bg-[var(--bg-elevated)] border rounded-lg text-sm text-(--text-primary)
             placeholder-[var(--text-placeholder)] outline-none transition-colors w-full
             ${hasRightIcon ? 'pr-8' : ''}
             ${error
@@ -37,20 +37,20 @@ export default function Input({ label, error, isValid, className = '', type, ...
             type="button"
             tabIndex={-1}
             onClick={() => setShowPassword(v => !v)}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white transition-colors"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-(--text-primary) transition-colors"
           >
             {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
           </button>
         )}
 
         {!isPassword && error && (
-          <XCircle size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-red-400 pointer-events-none" />
+          <XCircle size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-(--c-red) pointer-events-none" />
         )}
         {!isPassword && isValid && !error && (
-          <CheckCircle2 size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-green-400 pointer-events-none" />
+          <CheckCircle2 size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-(--c-green) pointer-events-none" />
         )}
       </div>
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-(--c-red)">{error}</span>}
     </div>
   );
 }

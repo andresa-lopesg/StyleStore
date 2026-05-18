@@ -101,7 +101,7 @@ export default function Usuarios() {
       <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar usuário..." />
 
       <Table
-        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
         emptyState={search
           ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhum usuário encontrado para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
           : <EmptyState icon={Shield} title="Nenhum usuário cadastrado" description="Crie o primeiro usuário do sistema." action={{ label: 'Criar usuário', onClick: openCreate }} />

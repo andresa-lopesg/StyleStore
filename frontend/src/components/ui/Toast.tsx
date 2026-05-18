@@ -2,9 +2,9 @@ import { X, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import type { ToastItem, ToastType } from '../../context/ToastContext';
 
 const styles: Record<ToastType, { border: string; iconClass: string }> = {
-  success: { border: 'border-green-500/30',  iconClass: 'text-green-400' },
-  error:   { border: 'border-red-500/30',    iconClass: 'text-red-400' },
-  warning: { border: 'border-yellow-500/30', iconClass: 'text-yellow-400' },
+  success: { border: 'border-green-500/30',  iconClass: 'text-(--c-green)' },
+  error:   { border: 'border-red-500/30',    iconClass: 'text-(--c-red)' },
+  warning: { border: 'border-yellow-500/30', iconClass: 'text-(--c-yellow)' },
 };
 
 const icons: Record<ToastType, React.ElementType> = {
@@ -20,10 +20,10 @@ function Toast({ toast, onRemove }: { toast: ToastItem; onRemove: (id: string) =
   return (
     <div className={`toast-animate flex items-start gap-3 px-4 py-3 rounded-xl border bg-[var(--bg-card)] ${border} shadow-2xl min-w-[280px] max-w-[360px]`}>
       <Icon size={16} className={`${iconClass} shrink-0 mt-0.5`} />
-      <p className="text-sm text-white flex-1 leading-snug">{toast.message}</p>
+      <p className="text-sm text-(--text-primary) flex-1 leading-snug">{toast.message}</p>
       <button
         onClick={() => onRemove(toast.id)}
-        className="text-[var(--text-muted)] hover:text-white transition-colors shrink-0 ml-1"
+        className="text-[var(--text-muted)] hover:text-(--text-primary) transition-colors shrink-0 ml-1"
       >
         <X size={14} />
       </button>

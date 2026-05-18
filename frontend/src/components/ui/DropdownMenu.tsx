@@ -37,8 +37,8 @@ export default function DropdownMenu({ trigger, items }: DropdownMenuProps) {
               onClick={() => { item.onClick(); setOpen(false); }}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors hover:bg-(--bg-hover) ${
                 item.variant === 'danger'
-                  ? 'text-red-400 hover:text-red-300'
-                  : 'text-(--text-secondary) hover:text-white'
+                  ? 'text-(--c-red) hover:text-(--c-red)'
+                  : 'text-(--text-secondary) hover:text-(--text-primary)'
               }`}
             >
               {item.icon}

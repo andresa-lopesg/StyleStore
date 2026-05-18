@@ -40,6 +40,18 @@ export default function Produtos() {
 
   const { data = [], isLoading } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
   const { data: categorias = [] } = useQuery({ queryKey: ['categorias'], queryFn: categoriasService.getAll });
+
+  const totalProdutos = data.length;
+  const totalEstoque = data.reduce((s, p) => s + (p.estoqueTotal ?? 0), 0);
+  const valorEstoque = data.reduce((s, p) => s + ((p.preco ?? 0) * (p.estoqueTotal ?? 0)), 0);
+  const categoriasAtivas = categorias.length;
+  const novosEsteMes = data.filter(p => {
+    const d = new Date(p.criadoEm);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const produtosAtivos = data.filter(p => p.ativo).length;
+
   const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
@@ -138,7 +150,7 @@ export default function Produtos() {
               </div>
           }
           <div>
-            <p className="text-sm text-white font-medium">{row.nome}</p>
+            <p className="text-sm text-(--text-primary) font-medium">{row.nome}</p>
             {row.referencia && <p className="text-xs text-(--text-muted)">{row.referencia}</p>}
           </div>
         </div>
@@ -150,7 +162,7 @@ export default function Produtos() {
     },
     {
       key: 'preco', header: 'Preço Venda',
-      render: (row: Produto) => <span className="text-green-400 font-medium">R$ {Number(row.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>,
+      render: (row: Produto) => <span className="text-(--c-green) font-medium">R$ {Number(row.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>,
     },
     {
       key: 'precoCusto', header: 'Custo',
@@ -160,8 +172,8 @@ export default function Produtos() {
       key: 'estoqueTotal', header: 'Estoque',
       render: (row: Produto) => (
         <div className="flex items-center gap-1.5">
-          {row.estoqueTotal < 10 && <AlertTriangle size={12} className="text-yellow-400" />}
-          <span className={row.estoqueTotal < 10 ? 'text-yellow-400' : 'text-white'}>{row.estoqueTotal} un</span>
+          {row.estoqueTotal < 10 && <AlertTriangle size={12} className="text-(--c-yellow)" />}
+          <span className={row.estoqueTotal < 10 ? 'text-(--c-yellow)' : 'text-(--text-primary)'}>{row.estoqueTotal} un</span>
         </div>
       ),
     },
@@ -170,16 +182,24 @@ export default function Produtos() {
       render: (row: Produto) => statusBadge(row),
     },
     {
-      key: 'acoes', header: 'Ações', width: '60px',
+      key: 'acoes', header: 'Ações', width: '80px',
       render: (row: Produto) => (
-        <DropdownMenu
-          trigger={<Button size="sm" variant="ghost" icon={<MoreVertical size={14} />} ariaLabel="Ações" />}
-          items={[
-            { label: 'Visualizar', icon: <Eye size={13} />, onClick: () => setViewProduto(row) },
-            { label: 'Editar', icon: <Pencil size={13} />, onClick: () => openEdit(row) },
-            { label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(row.id), variant: 'danger' },
-          ]}
-        />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setViewProduto(row)}
+            aria-label="Visualizar produto"
+            className="p-1.5 rounded hover:bg-(--bg-hover) text-(--text-muted) hover:text-(--text-primary) transition-colors"
+          >
+            <Eye size={15} />
+          </button>
+          <DropdownMenu
+            trigger={<Button size="sm" variant="ghost" icon={<MoreVertical size={14} />} ariaLabel="Ações" />}
+            items={[
+              { label: 'Editar', icon: <Pencil size={13} />, onClick: () => openEdit(row) },
+              { label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(row.id), variant: 'danger' },
+            ]}
+          />
+        </div>
       ),
     },
   ];
@@ -187,9 +207,48 @@ export default function Produtos() {
   return (
     <PageShell
       title="Produtos"
-      subtitle={<>{data.filter(p => p.ativo).length} ativos{data.filter(p => p.estoqueTotal < 10).length > 0 && <span className="text-yellow-400 ml-2">· {data.filter(p => p.estoqueTotal < 10).length} com estoque baixo</span>}</>}
+      subtitle="Gerencie seu catálogo de produtos"
       action={<Button variant="primary" icon={<Plus size={14} />} onClick={openCreate}>Novo Produto</Button>}
     >
+
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        {isLoading ? (
+          [0, 1, 2, 3].map(i => (
+            <div key={i} className="bg-(--bg-card) border border-(--border) rounded-xl p-5 min-h-[100px]">
+              <div className="h-3 w-24 shimmer rounded mb-2" />
+              <div className="h-7 w-16 shimmer rounded mb-2" />
+              <div className="h-3 w-28 shimmer rounded" />
+            </div>
+          ))
+        ) : (
+          <>
+            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
+              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Total de Produtos</p>
+              <p className="text-3xl font-semibold text-(--text-primary)">{totalProdutos}</p>
+              <p className="text-xs text-(--text-secondary)">
+                {novosEsteMes > 0 ? `+${novosEsteMes} este mês` : 'Nenhum novo este mês'}
+              </p>
+            </div>
+            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
+              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Estoque Total</p>
+              <p className="text-3xl font-semibold text-(--text-primary)">{totalEstoque.toLocaleString('pt-BR')} un</p>
+              <p className="text-xs text-(--text-secondary)">{produtosAtivos} produtos ativos</p>
+            </div>
+            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
+              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Valor do Estoque</p>
+              <p className="text-3xl font-semibold text-(--text-primary)">
+                {valorEstoque.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </p>
+              <p className="text-xs text-(--text-secondary)">Valor total em estoque</p>
+            </div>
+            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
+              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Categorias</p>
+              <p className="text-3xl font-semibold text-(--text-primary)">{categoriasAtivas}</p>
+              <p className="text-xs text-(--text-secondary)">Categorias ativas</p>
+            </div>
+          </>
+        )}
+      </div>
 
       <FilterBar
         actions={(
@@ -213,7 +272,7 @@ export default function Produtos() {
         <select
           value={catFilter}
           onChange={e => setCatFilter(e.target.value)}
-          className="h-9 px-3 bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent)"
+          className="h-9 px-3 min-w-[160px] bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent) cursor-pointer"
         >
           <option value="">Todas as categorias</option>
           {categorias.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
@@ -221,7 +280,7 @@ export default function Produtos() {
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="h-9 px-3 bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent)"
+          className="h-9 px-3 min-w-[160px] bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent) cursor-pointer"
         >
           <option value="">Todos os status</option>
           <option value="ativo">Ativo</option>
@@ -230,7 +289,7 @@ export default function Produtos() {
         <select
           value={estoqueFilter}
           onChange={e => setEstoqueFilter(e.target.value)}
-          className="h-9 px-3 bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent)"
+          className="h-9 px-3 min-w-[160px] bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent) cursor-pointer"
         >
           <option value="">Todos os estoques</option>
           <option value="baixo">Estoque baixo (&lt;10)</option>
@@ -242,7 +301,7 @@ export default function Produtos() {
             className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
               view === 'list'
                 ? 'bg-(--accent) text-white'
-                : 'text-(--text-muted) hover:text-white hover:bg-(--bg-elevated)'
+                : 'text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-elevated)'
             }`}
           >
             <List size={15} />
@@ -252,7 +311,7 @@ export default function Produtos() {
             className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
               view === 'grid'
                 ? 'bg-(--accent) text-white'
-                : 'text-(--text-muted) hover:text-white hover:bg-(--bg-elevated)'
+                : 'text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-elevated)'
             }`}
           >
             <LayoutGrid size={15} />
@@ -262,7 +321,7 @@ export default function Produtos() {
 
       {view === 'list' ? (
         <Table
-          columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+          columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
           emptyState={(search || catFilter || statusFilter || estoqueFilter)
             ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description="Tente ajustar os filtros ou limpar a busca." action={{ label: 'Limpar busca', onClick: () => { setSearch(''); setCatFilter(''); setStatusFilter(''); setEstoqueFilter(''); } }} />
             : <EmptyState icon={Package} title="Nenhum produto cadastrado" description="Adicione o primeiro produto para começar." action={{ label: 'Adicionar produto', onClick: openCreate }} />
@@ -282,21 +341,27 @@ export default function Produtos() {
                   }
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-white leading-snug line-clamp-2">{p.nome}</p>
+                  <p className="text-sm font-medium text-(--text-primary) leading-snug line-clamp-2">{p.nome}</p>
                   {p.referencia && <p className="text-xs text-(--text-muted) mt-0.5">{p.referencia}</p>}
                   {p.categoria && <span className="inline-block mt-1.5"><Badge color="indigo">{p.categoria.nome}</Badge></span>}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-green-400">
+                  <span className="text-sm font-semibold text-(--c-green)">
                     {p.preco?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </span>
                   {statusBadge(p)}
                 </div>
-                <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                  <button
+                    onClick={() => setViewProduto(p)}
+                    aria-label="Visualizar produto"
+                    className="p-1.5 rounded bg-(--bg-elevated) hover:bg-(--bg-hover) text-(--text-muted) hover:text-(--text-primary) transition-colors"
+                  >
+                    <Eye size={14} />
+                  </button>
                   <DropdownMenu
                     trigger={<Button size="sm" variant="ghost" icon={<MoreVertical size={14} />} ariaLabel="Ações" />}
                     items={[
-                      { label: 'Visualizar', icon: <Eye size={13} />, onClick: () => setViewProduto(p) },
                       { label: 'Editar', icon: <Pencil size={13} />, onClick: () => openEdit(p) },
                       { label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(p.id), variant: 'danger' },
                     ]}
@@ -346,7 +411,7 @@ export default function Produtos() {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-xs text-(--text-muted) mb-0.5">Nome</p>
-                <p className="text-white">{viewProduto.nome}</p>
+                <p className="text-(--text-primary)">{viewProduto.nome}</p>
               </div>
               <div>
                 <p className="text-xs text-(--text-muted) mb-0.5">Referência</p>
@@ -362,7 +427,7 @@ export default function Produtos() {
               </div>
               <div>
                 <p className="text-xs text-(--text-muted) mb-0.5">Preço de venda</p>
-                <p className="text-green-400 font-medium">
+                <p className="text-(--c-green) font-medium">
                   {viewProduto.preco?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </p>
               </div>
@@ -374,7 +439,7 @@ export default function Produtos() {
               </div>
               <div>
                 <p className="text-xs text-(--text-muted) mb-0.5">Estoque total</p>
-                <p className="text-white">{viewProduto.estoqueTotal} unidades</p>
+                <p className="text-(--text-primary)">{viewProduto.estoqueTotal} unidades</p>
               </div>
               <div>
                 <p className="text-xs text-(--text-muted) mb-0.5">Criado em</p>

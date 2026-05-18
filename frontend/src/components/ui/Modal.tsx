@@ -46,10 +46,10 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
         onMouseDown={e => { e.stopPropagation(); mouseDownOnOverlay.current = false; }}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-(--border)">
-          <h2 className="text-sm font-semibold text-white">{title}</h2>
+          <h2 className="text-sm font-semibold text-(--text-primary)">{title}</h2>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-white hover:bg-(--bg-elevated) transition-colors"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-elevated) transition-colors"
           >
             <X size={14} />
           </button>

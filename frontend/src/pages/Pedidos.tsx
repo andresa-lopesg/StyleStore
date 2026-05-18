@@ -155,11 +155,11 @@ export default function Pedidos() {
   const columns = [
     {
       key: 'id', header: 'Pedido',
-      render: (row: Pedido) => <span className="font-mono text-indigo-400 font-medium">#{String(row.id).padStart(4, '0')}</span>,
+      render: (row: Pedido) => <span className="font-mono text-(--c-indigo) font-medium">#{String(row.id).padStart(4, '0')}</span>,
     },
     {
       key: 'cliente', header: 'Cliente',
-      render: (row: Pedido) => <span className="text-white">{row.cliente?.nome ?? `#${row.clienteId}`}</span>,
+      render: (row: Pedido) => <span className="text-(--text-primary)">{row.cliente?.nome ?? `#${row.clienteId}`}</span>,
     },
     {
       key: 'dataPedido', header: 'Data',
@@ -171,7 +171,7 @@ export default function Pedidos() {
     },
     {
       key: 'total', header: 'Total',
-      render: (row: Pedido) => <span className="text-green-400 font-medium">R$ {Number(row.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>,
+      render: (row: Pedido) => <span className="text-(--c-green) font-medium">R$ {Number(row.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>,
     },
     {
       key: 'acoes', header: 'Ações', width: '60px',
@@ -198,7 +198,7 @@ export default function Pedidos() {
       <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por ID ou cliente..." />
 
       <Table
-        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
         emptyState={search
           ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhum pedido encontrado para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
           : <EmptyState icon={ShoppingBag} title="Nenhum pedido registrado" description="Registre o primeiro pedido para começar." action={{ label: 'Criar pedido', onClick: openCreate }} />
@@ -212,7 +212,7 @@ export default function Pedidos() {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-(--bg-elevated) rounded-lg p-3">
                 <p className="text-xs text-(--text-muted) uppercase">Cliente</p>
-                <p className="text-sm text-white mt-0.5">{viewPedido.cliente?.nome ?? `#${viewPedido.clienteId}`}</p>
+                <p className="text-sm text-(--text-primary) mt-0.5">{viewPedido.cliente?.nome ?? `#${viewPedido.clienteId}`}</p>
               </div>
               <div className="bg-(--bg-elevated) rounded-lg p-3">
                 <p className="text-xs text-(--text-muted) uppercase">Status</p>
@@ -220,11 +220,11 @@ export default function Pedidos() {
               </div>
               <div className="bg-(--bg-elevated) rounded-lg p-3">
                 <p className="text-xs text-(--text-muted) uppercase">Total</p>
-                <p className="text-sm text-green-400 font-medium mt-0.5">R$ {Number(viewPedido.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-sm text-(--c-green) font-medium mt-0.5">R$ {Number(viewPedido.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
               </div>
               <div className="bg-(--bg-elevated) rounded-lg p-3">
                 <p className="text-xs text-(--text-muted) uppercase">Data</p>
-                <p className="text-sm text-white mt-0.5">{new Date(viewPedido.dataPedido).toLocaleDateString('pt-BR')}</p>
+                <p className="text-sm text-(--text-primary) mt-0.5">{new Date(viewPedido.dataPedido).toLocaleDateString('pt-BR')}</p>
               </div>
             </div>
             {viewPedido.observacao && (
@@ -240,12 +240,12 @@ export default function Pedidos() {
                   {viewPedido.itens.map(item => (
                     <div key={item.id} className="flex justify-between items-center bg-(--bg-elevated) rounded-lg p-3">
                       <div>
-                        <p className="text-sm text-white">{item.produto?.nome ?? `Produto #${item.produtoId}`}</p>
+                        <p className="text-sm text-(--text-primary)">{item.produto?.nome ?? `Produto #${item.produtoId}`}</p>
                         {item.tamanho && <p className="text-xs text-(--text-muted)">Tam: {item.tamanho} {item.cor && `· Cor: ${item.cor}`}</p>}
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-white">{item.quantidade}x</p>
-                        <p className="text-xs text-green-400">R$ {Number(item.precoUnitario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-sm text-(--text-primary)">{item.quantidade}x</p>
+                        <p className="text-xs text-(--c-green)">R$ {Number(item.precoUnitario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   ))}
@@ -260,12 +260,12 @@ export default function Pedidos() {
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Pedido' : 'Novo Pedido'} size="lg">
         {/* Stepper header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className={`flex items-center gap-2 ${step >= 1 ? 'text-white' : 'text-(--text-muted)'}`}>
+          <div className={`flex items-center gap-2 ${step >= 1 ? 'text-(--text-primary)' : 'text-(--text-muted)'}`}>
             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-(--bg-hover) text-(--text-muted)'}`}>1</span>
             <span className="text-sm font-medium">Dados do Pedido</span>
           </div>
           <div className="flex-1 h-px bg-(--border)" />
-          <div className={`flex items-center gap-2 ${step >= 2 ? 'text-white' : 'text-(--text-muted)'}`}>
+          <div className={`flex items-center gap-2 ${step >= 2 ? 'text-(--text-primary)' : 'text-(--text-muted)'}`}>
             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-(--bg-hover) text-(--text-muted)'}`}>2</span>
             <span className="text-sm font-medium">Itens</span>
           </div>
@@ -347,7 +347,7 @@ export default function Pedidos() {
                       <button
                         type="button"
                         onClick={() => removeItem(index)}
-                        className="h-9 w-8 flex items-center justify-center rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                        className="h-9 w-8 flex items-center justify-center rounded-lg text-(--c-red) hover:text-(--c-red) hover:bg-red-500/10 transition-colors"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -360,21 +360,21 @@ export default function Pedidos() {
                 Adicionar Item
               </Button>
 
-              {itensError && <p className="text-xs text-red-400">{itensError}</p>}
+              {itensError && <p className="text-xs text-(--c-red)">{itensError}</p>}
 
               {itens.length > 0 && (
                 <div className="bg-(--bg-elevated) rounded-lg p-3 flex flex-col gap-1.5 text-sm">
                   <div className="flex justify-between">
                     <span className="text-(--text-muted)">Subtotal</span>
-                    <span className="text-white">R$ {subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-(--text-primary)">R$ {subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-(--text-muted)">Desconto</span>
-                    <span className="text-red-400">- R$ {desconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-(--c-red)">- R$ {desconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between border-t border-(--border) pt-1.5 font-medium">
-                    <span className="text-white">Total</span>
-                    <span className="text-green-400">R$ {totalCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-(--text-primary)">Total</span>
+                    <span className="text-(--c-green)">R$ {totalCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
               )}

@@ -125,8 +125,8 @@ export default function Dashboard() {
   ).slice(0, 5);
 
   const statusColors: Record<number, string> = {
-    0: 'text-yellow-400', 1: 'text-blue-400', 2: 'text-purple-400',
-    3: 'text-indigo-400', 4: 'text-cyan-400', 5: 'text-green-400', 6: 'text-red-400',
+    0: 'text-(--c-yellow)', 1: 'text-(--c-blue)', 2: 'text-(--c-purple)',
+    3: 'text-(--c-indigo)', 4: 'text-(--c-cyan)', 5: 'text-(--c-green)', 6: 'text-(--c-red)',
   };
 
   if (isError) {
@@ -150,7 +150,7 @@ export default function Dashboard() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 period === p.value
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-(--bg-elevated) text-(--text-secondary) hover:text-white'
+                  : 'bg-(--bg-elevated) text-(--text-secondary) hover:text-(--text-primary)'
               }`}
             >
               {p.label}
@@ -165,7 +165,7 @@ export default function Dashboard() {
           loading={isLoading}
           title="Receita Total"
           value={`R$ ${receitaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          icon={<div className="w-9 h-9 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center"><TrendingUp size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-indigo-600/20 text-(--c-indigo) flex items-center justify-center"><TrendingUp size={16} /></div>}
           delta={calcDelta(receitaAtual, receitaAnterior)}
           sparklineData={receitaSparkData}
         />
@@ -173,7 +173,7 @@ export default function Dashboard() {
           loading={isLoading}
           title="Pedidos"
           value={pedidosAtuais.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center"><ShoppingCart size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-blue-600/20 text-(--c-blue) flex items-center justify-center"><ShoppingCart size={16} /></div>}
           delta={calcDelta(pedidosAtuais.length, pedidosAnteriores.length)}
           sparklineData={pedidosSparkData}
         />
@@ -181,14 +181,14 @@ export default function Dashboard() {
           loading={isLoading}
           title="Clientes"
           value={clientes.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-green-600/20 text-green-400 flex items-center justify-center"><Users size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-green-600/20 text-(--c-green) flex items-center justify-center"><Users size={16} /></div>}
           sparklineData={clientesSparkData}
         />
         <StatCard
           loading={isLoading}
           title="Produtos"
           value={produtos.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center"><Package size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-purple-600/20 text-(--c-purple) flex items-center justify-center"><Package size={16} /></div>}
         />
       </div>
 
@@ -198,7 +198,7 @@ export default function Dashboard() {
           loading={isLoading}
           title="Funcionários"
           value={funcionarios.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-yellow-600/20 text-yellow-400 flex items-center justify-center"><UserCheck size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-yellow-600/20 text-(--c-yellow) flex items-center justify-center"><UserCheck size={16} /></div>}
         />
         <StatCard
           loading={isLoading}
@@ -211,21 +211,21 @@ export default function Dashboard() {
           loading={isLoading}
           title="Em Produção"
           value={producaoAtiva}
-          icon={<div className="w-9 h-9 rounded-lg bg-cyan-600/20 text-cyan-400 flex items-center justify-center"><Factory size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-cyan-600/20 text-(--c-cyan) flex items-center justify-center"><Factory size={16} /></div>}
           delta={calcDelta(producaoAtualCount, producaoAnteriorCount)}
         />
         <StatCard
           loading={isLoading}
           title="Estoque Baixo"
           value={produtos.filter(p => p.estoqueTotal < 10).length}
-          icon={<div className="w-9 h-9 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center"><Package size={16} /></div>}
+          icon={<div className="w-9 h-9 rounded-lg bg-red-600/20 text-(--c-red) flex items-center justify-center"><Package size={16} /></div>}
         />
       </div>
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Surface className="xl:col-span-2">
-          <h3 className="text-sm font-semibold text-white mb-4">Receita Mensal</h3>
+          <h3 className="text-sm font-semibold text-(--text-primary) mb-4">Receita Mensal</h3>
           {isLoading ? (
             <div className="h-[220px] w-full shimmer rounded-xl" />
           ) : (
@@ -241,7 +241,7 @@ export default function Dashboard() {
                 <XAxis dataKey="mes" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-input)', borderRadius: 8, color: '#fff', fontSize: 12 }}
+                  contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-input)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }}
                   formatter={(v) => [`R$ ${Number(v).toLocaleString('pt-BR')}`, 'Receita']}
                 />
                 <Area type="monotone" dataKey="valor" stroke="#6366f1" strokeWidth={2} fill="url(#gradIndigo)" />
@@ -251,7 +251,7 @@ export default function Dashboard() {
         </Surface>
 
         <Surface>
-          <h3 className="text-sm font-semibold text-white mb-4">Status dos Pedidos</h3>
+          <h3 className="text-sm font-semibold text-(--text-primary) mb-4">Status dos Pedidos</h3>
           {isLoading ? (
             <div className="w-40 h-40 shimmer rounded-full mx-auto mt-4" />
           ) : statusPedidos.length > 0 ? (
@@ -261,7 +261,7 @@ export default function Dashboard() {
                   {statusPedidos.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                 </Pie>
                 <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 11, color: 'var(--text-secondary)' }} />
-                <Tooltip contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-input)', borderRadius: 8, color: '#fff', fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-input)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
@@ -273,7 +273,7 @@ export default function Dashboard() {
       {/* Últimos pedidos + Top produtos */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <Surface>
-          <h3 className="text-sm font-semibold text-white mb-4">Últimos Pedidos</h3>
+          <h3 className="text-sm font-semibold text-(--text-primary) mb-4">Últimos Pedidos</h3>
           {isLoading ? (
             <div className="flex flex-col gap-2">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -296,11 +296,11 @@ export default function Dashboard() {
               {ultimosPedidos.map(pedido => (
                 <div key={pedido.id} className="flex items-center justify-between py-2.5 border-b border-(--border) last:border-0">
                   <div>
-                    <p className="text-xs font-medium text-white">Pedido #{pedido.id}</p>
+                    <p className="text-xs font-medium text-(--text-primary)">Pedido #{pedido.id}</p>
                     <p className="text-xs text-(--text-muted)">{pedido.cliente?.nome ?? `Cliente #${pedido.clienteId}`}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium text-white">R$ {pedido.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-xs font-medium text-(--text-primary)">R$ {pedido.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     <p className={`text-xs ${statusColors[pedido.status]}`}>{StatusPedidoLabel[pedido.status]}</p>
                   </div>
                 </div>
@@ -310,7 +310,7 @@ export default function Dashboard() {
         </Surface>
 
         <Surface>
-          <h3 className="text-sm font-semibold text-white mb-4">Estoque por Categoria</h3>
+          <h3 className="text-sm font-semibold text-(--text-primary) mb-4">Estoque por Categoria</h3>
           {isLoading ? (
             <div className="h-[200px] w-full shimmer rounded-xl" />
           ) : (
@@ -319,7 +319,7 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="nome" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-input)', borderRadius: 8, color: '#fff', fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-input)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }} />
                 <Bar dataKey="estoque" fill="#6366f1" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

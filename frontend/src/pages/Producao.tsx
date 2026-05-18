@@ -98,9 +98,9 @@ export default function Producao() {
       render: (row: Producao) => (
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-md bg-indigo-600/20 flex items-center justify-center">
-            <Factory size={12} className="text-indigo-400" />
+            <Factory size={12} className="text-(--c-indigo)" />
           </div>
-          <span className="text-white">{row.produto?.nome ?? `#${row.produtoId}`}</span>
+          <span className="text-(--text-primary)">{row.produto?.nome ?? `#${row.produtoId}`}</span>
         </div>
       ),
     },
@@ -108,7 +108,7 @@ export default function Producao() {
       key: 'quantidade', header: 'Qtd Planejada/Produzida',
       render: (row: Producao) => (
         <div className="flex items-center gap-2">
-          <span className="text-white">{row.quantidadeProduzida}</span>
+          <span className="text-(--text-primary)">{row.quantidadeProduzida}</span>
           <span className="text-(--text-muted)">/</span>
           <span className="text-(--text-muted)">{row.quantidadePlanejada}</span>
           <div className="w-16 h-1.5 bg-(--bg-hover) rounded-full overflow-hidden">
@@ -154,7 +154,7 @@ export default function Producao() {
       <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por produto ou responsável..." />
 
       <Table
-        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
         emptyState={search
           ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhuma produção encontrada para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
           : <EmptyState icon={Factory} title="Nenhuma produção em andamento" description="Inicie a primeira ordem de produção." action={{ label: 'Iniciar produção', onClick: openCreate }} />

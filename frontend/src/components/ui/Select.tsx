@@ -25,7 +25,7 @@ export default function Select({ label, error, isValid, options, children, class
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
       </select>
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-(--c-red)">{error}</span>}
     </div>
   );
 }

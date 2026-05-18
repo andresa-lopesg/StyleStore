@@ -90,7 +90,7 @@ export default function Clientes() {
       <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." />
 
       <Table
-        columns={columns} data={filtered} keyField="id" loading={isLoading} pageSize={20}
+        columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
         emptyState={search
           ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description={`Nenhum cliente encontrado para "${search}".`} action={{ label: 'Limpar busca', onClick: () => setSearch('') }} />
           : <EmptyState icon={Users} title="Nenhum cliente cadastrado" description="Adicione o primeiro cliente para começar." action={{ label: 'Adicionar cliente', onClick: openCreate }} />
