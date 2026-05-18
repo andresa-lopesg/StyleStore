@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ApiClientes.Models;
 
 public enum StatusProducao
@@ -17,10 +19,14 @@ public class Producao
     public StatusProducao Status { get; set; } = StatusProducao.Aguardando;
     public DateTime DataInicio { get; set; }
     public DateTime? DataFim { get; set; }
-    public string? Observacao { get; set; }
-    public string Responsavel { get; set; } = string.Empty;
+    [MaxLength(1000)] public string? Observacao { get; set; }
+    [MaxLength(150)]  public string Responsavel { get; set; } = string.Empty;
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+    public DateTime? AtualizadoEm { get; set; }
 
     public int ProdutoId { get; set; }
     public Produto? Produto { get; set; }
+
+    public int? FuncionarioId { get; set; }
+    public Funcionario? Funcionario { get; set; }
 }

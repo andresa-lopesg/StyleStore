@@ -41,7 +41,9 @@ public class ProducaoController : ControllerBase
     public async Task<IActionResult> Update(int id, Producao producao)
     {
         if (id != producao.Id) return BadRequest();
-        _context.Entry(producao).State = EntityState.Modified;
+        var existing = await _context.Producoes.FindAsync(id);
+        if (existing == null) return NotFound();
+        _context.Entry(existing).CurrentValues.SetValues(producao);
         await _context.SaveChangesAsync();
         return NoContent();
     }
@@ -51,6 +53,19 @@ public class ProducaoController : ControllerBase
     {
         var producao = await _context.Producoes.FindAsync(id);
         if (producao == null) return NotFound();
+
+        var transicoes = new Dictionary<StatusProducao, StatusProducao[]>
+        {
+            [StatusProducao.Aguardando]   = [StatusProducao.EmAndamento, StatusProducao.Cancelado],
+            [StatusProducao.EmAndamento]  = [StatusProducao.Pausado, StatusProducao.Concluido, StatusProducao.Cancelado],
+            [StatusProducao.Pausado]      = [StatusProducao.EmAndamento, StatusProducao.Cancelado],
+            [StatusProducao.Concluido]    = [],
+            [StatusProducao.Cancelado]    = [],
+        };
+
+        if (!transicoes[producao.Status].Contains(status))
+            return BadRequest($"Transição inválida: {producao.Status} → {status}.");
+
         producao.Status = status;
         await _context.SaveChangesAsync();
         return NoContent();

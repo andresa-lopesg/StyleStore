@@ -22,6 +22,7 @@ public class Pedido
     public string? EnderecoEntrega { get; set; }
     public DateTime? DataEntregaPrevista { get; set; }
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+    public DateTime? AtualizadoEm { get; set; }
 
     public int ClienteId { get; set; }
     public Cliente? Cliente { get; set; }

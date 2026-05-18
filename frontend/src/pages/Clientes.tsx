@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, MoreVertical, Users, SearchX } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { clientesService } from '../services/clientes';
 import type { Cliente } from '../types';
 import { useToast } from '../context/ToastContext';
@@ -10,6 +10,7 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import MaskedInput from '../components/ui/MaskedInput';
 import SearchInput from '../components/ui/SearchInput';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import DropdownMenu from '../components/ui/DropdownMenu';
@@ -27,7 +28,7 @@ export default function Clientes() {
 
   const { data = [], isLoading } = useQuery({ queryKey: ['clientes'], queryFn: clientesService.getAll });
 
-  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
+  const { register, handleSubmit, reset, control, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: clientesService.create,
@@ -101,7 +102,23 @@ export default function Clientes() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Nome obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
           <Input label="E-mail" type="email" placeholder="email@exemplo.com" {...register('email', { required: 'E-mail obrigatório' })} error={errors.email?.message} isValid={!!dirtyFields.email && !errors.email} />
-          <Input label="Telefone" placeholder="(11) 99999-9999" {...register('telefone')} />
+          <Controller
+            name="telefone"
+            control={control}
+            rules={{ minLength: { value: 10, message: 'Telefone inválido' } }}
+            render={({ field }) => (
+              <MaskedInput
+                label="Telefone"
+                mask="(00) 00000-0000"
+                placeholder="(11) 99999-9999"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.telefone?.message}
+                isValid={!!dirtyFields.telefone && !errors.telefone}
+              />
+            )}
+          />
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="secondary" onClick={closeModal}>Cancelar</Button>
             <Button type="submit" variant="primary" loading={createMutation.isPending || updateMutation.isPending}>

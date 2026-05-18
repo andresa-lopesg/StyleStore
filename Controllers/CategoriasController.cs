@@ -39,7 +39,9 @@ public class CategoriasController : ControllerBase
     public async Task<IActionResult> Update(int id, Categoria categoria)
     {
         if (id != categoria.Id) return BadRequest();
-        _context.Entry(categoria).State = EntityState.Modified;
+        var existing = await _context.Categorias.FindAsync(id);
+        if (existing == null) return NotFound();
+        _context.Entry(existing).CurrentValues.SetValues(categoria);
         await _context.SaveChangesAsync();
         return NoContent();
     }

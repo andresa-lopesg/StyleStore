@@ -17,6 +17,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 
 //configuram o schema e tipos de coluna. As colunas de cada tabela são definidas pelos Models na pasta Models/. Tudo isso é interpretado pelo Entity Framework para criar o banco automaticamente.
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var agora = DateTime.UtcNow;
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.State == EntityState.Modified)
+            {
+                var prop = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "AtualizadoEm");
+                if (prop != null) prop.CurrentValue = agora;
+            }
+        }
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("dbo");  
@@ -44,5 +58,34 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<ItemPedido>()
             .Property(i => i.PrecoUnitario)
             .HasColumnType("numeric(18,2)");
+
+        // Índices únicos de Email
+        modelBuilder.Entity<Funcionario>()
+            .HasIndex(f => f.Email).IsUnique();
+        modelBuilder.Entity<Funcionario>()
+            .HasIndex(f => f.Cpf).IsUnique();
+        modelBuilder.Entity<Usuario>()
+            .HasIndex(u => u.Email).IsUnique();
+
+        // Categoria → Produto: Restrict para não apagar produtos ao deletar categoria
+        modelBuilder.Entity<Produto>()
+            .HasOne(p => p.Categoria)
+            .WithMany(c => c.Produtos)
+            .HasForeignKey(p => p.CategoriaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Cliente → Pedido: Restrict para preservar histórico de pedidos
+        modelBuilder.Entity<Pedido>()
+            .HasOne(p => p.Cliente)
+            .WithMany()
+            .HasForeignKey(p => p.ClienteId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Produto → ItemPedido: Restrict para preservar histórico financeiro
+        modelBuilder.Entity<ItemPedido>()
+            .HasOne(i => i.Produto)
+            .WithMany(p => p.ItensPedido)
+            .HasForeignKey(i => i.ProdutoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

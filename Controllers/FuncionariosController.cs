@@ -37,7 +37,9 @@ public class FuncionariosController : ControllerBase
     public async Task<IActionResult> Update(int id, Funcionario funcionario)
     {
         if (id != funcionario.Id) return BadRequest();
-        _context.Entry(funcionario).State = EntityState.Modified;
+        var existing = await _context.Funcionarios.FindAsync(id);
+        if (existing == null) return NotFound();
+        _context.Entry(existing).CurrentValues.SetValues(funcionario);
         await _context.SaveChangesAsync();
         return NoContent();
     }

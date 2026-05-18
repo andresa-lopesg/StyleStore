@@ -39,12 +39,14 @@
           return CreatedAtAction(nameof(GetById), new { id = cliente.Id }, cliente);
       }                                                                                                                                                                                                
   
-      [HttpPut("{id}")]                                                                                                                                                                                
+      [HttpPut("{id}")]
       public async Task<IActionResult> Update(int id, Cliente cliente)
       {
           if (id != cliente.Id) return BadRequest();
-          _context.Entry(cliente).State = EntityState.Modified;
-          await _context.SaveChangesAsync();                                                                                                                                                           
+          var existing = await _context.Clientes.FindAsync(id);
+          if (existing == null) return NotFound();
+          _context.Entry(existing).CurrentValues.SetValues(cliente);
+          await _context.SaveChangesAsync();
           return NoContent();
       }                                                                                                                                                                                                
                   

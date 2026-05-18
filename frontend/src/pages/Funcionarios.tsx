@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, MoreVertical, UserCheck, SearchX } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { funcionariosService } from '../services/funcionarios';
 import type { Funcionario } from '../types';
 import { useToast } from '../context/ToastContext';
@@ -10,6 +10,7 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import MaskedInput from '../components/ui/MaskedInput';
 import SearchInput from '../components/ui/SearchInput';
 import Select from '../components/ui/Select';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
@@ -30,7 +31,7 @@ export default function Funcionarios() {
   const [editing, setEditing] = useState<Funcionario | null>(null);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['funcionarios'], queryFn: funcionariosService.getAll });
-  const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
+  const { register, handleSubmit, reset, control, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
   const createMutation = useMutation({
     mutationFn: funcionariosService.create,
@@ -128,9 +129,41 @@ export default function Funcionarios() {
       <Modal open={modalOpen} onClose={closeModal} title={editing ? 'Editar Funcionário' : 'Novo Funcionário'} size="lg">
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input label="Nome" placeholder="Nome completo" {...register('nome', { required: 'Obrigatório' })} error={errors.nome?.message} isValid={!!dirtyFields.nome && !errors.nome} />
-          <Input label="CPF" placeholder="000.000.000-00" {...register('cpf', { required: 'Obrigatório' })} error={errors.cpf?.message} isValid={!!dirtyFields.cpf && !errors.cpf} />
+          <Controller
+            name="cpf"
+            control={control}
+            rules={{ required: 'Obrigatório', minLength: { value: 11, message: 'CPF inválido' } }}
+            render={({ field }) => (
+              <MaskedInput
+                label="CPF"
+                mask="000.000.000-00"
+                placeholder="000.000.000-00"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.cpf?.message}
+                isValid={!!dirtyFields.cpf && !errors.cpf}
+              />
+            )}
+          />
           <Input label="E-mail" type="email" placeholder="email@loja.com" {...register('email', { required: 'Obrigatório' })} error={errors.email?.message} isValid={!!dirtyFields.email && !errors.email} />
-          <Input label="Telefone" placeholder="(11) 99999-9999" {...register('telefone')} />
+          <Controller
+            name="telefone"
+            control={control}
+            rules={{ minLength: { value: 10, message: 'Telefone inválido' } }}
+            render={({ field }) => (
+              <MaskedInput
+                label="Telefone"
+                mask="(00) 00000-0000"
+                placeholder="(11) 99999-9999"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.telefone?.message}
+                isValid={!!dirtyFields.telefone && !errors.telefone}
+              />
+            )}
+          />
           <Select label="Cargo" {...register('cargo', { required: 'Obrigatório' })} error={errors.cargo?.message}>
             <option value="">Selecione...</option>
             {cargos.map(c => <option key={c} value={c}>{c}</option>)}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, Package, AlertTriangle, MoreVertical, Download, LayoutGrid, List, Eye, SearchX } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -37,6 +37,8 @@ export default function Produtos() {
   const [editing, setEditing] = useState<Produto | null>(null);
   const [viewProduto, setViewProduto] = useState<Produto | null>(null);
   const [view, setView] = useState<'list' | 'grid'>('list');
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
   const { data: categorias = [] } = useQuery({ queryKey: ['categorias'], queryFn: categoriasService.getAll });
@@ -51,6 +53,8 @@ export default function Produtos() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
   const produtosAtivos = data.filter(p => p.ativo).length;
+
+  useEffect(() => { setSelectedIds([]); }, [search, catFilter, statusFilter, estoqueFilter]);
 
   const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
@@ -70,6 +74,20 @@ export default function Produtos() {
     mutationFn: produtosService.delete,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); setDeleteId(null); toast('Produto excluído com sucesso'); },
     onError: () => toast('Erro ao excluir produto. Tente novamente.', 'error'),
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      for (const id of ids) await produtosService.delete(id);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['produtos'] });
+      const count = selectedIds.length;
+      setSelectedIds([]);
+      setBulkDeleteOpen(false);
+      toast(`${count} produto${count !== 1 ? 's' : ''} excluído${count !== 1 ? 's' : ''}`);
+    },
+    onError: () => toast('Erro ao excluir produtos. Tente novamente.', 'error'),
   });
 
   function openCreate() {
@@ -319,9 +337,23 @@ export default function Produtos() {
         </div>
       </FilterBar>
 
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-(--bg-elevated) border border-(--border-input) rounded-xl">
+          <span className="text-sm text-(--text-secondary)">
+            {selectedIds.length} produto{selectedIds.length !== 1 ? 's' : ''} selecionado{selectedIds.length !== 1 ? 's' : ''}
+          </span>
+          <div className="flex-1" />
+          <Button size="sm" variant="danger" icon={<Trash2 size={13} />} onClick={() => setBulkDeleteOpen(true)}>
+            Excluir selecionados
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>Cancelar</Button>
+        </div>
+      )}
+
       {view === 'list' ? (
         <Table
           columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
+          selectable selectedIds={selectedIds} onSelectionChange={ids => setSelectedIds(ids as number[])}
           emptyState={(search || catFilter || statusFilter || estoqueFilter)
             ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description="Tente ajustar os filtros ou limpar a busca." action={{ label: 'Limpar busca', onClick: () => { setSearch(''); setCatFilter(''); setStatusFilter(''); setEstoqueFilter(''); } }} />
             : <EmptyState icon={Package} title="Nenhum produto cadastrado" description="Adicione o primeiro produto para começar." action={{ label: 'Adicionar produto', onClick: openCreate }} />
@@ -463,6 +495,14 @@ export default function Produtos() {
       </Modal>
 
       <ConfirmDialog open={deleteId !== null} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && deleteMutation.mutate(deleteId)} loading={deleteMutation.isPending} />
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        onClose={() => setBulkDeleteOpen(false)}
+        onConfirm={() => bulkDeleteMutation.mutate(selectedIds)}
+        loading={bulkDeleteMutation.isPending}
+        title="Excluir produtos selecionados"
+        message={`Tem certeza que deseja excluir ${selectedIds.length} produto${selectedIds.length !== 1 ? 's' : ''}? Esta ação não pode ser desfeita.`}
+      />
     </PageShell>
   );
 }

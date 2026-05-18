@@ -36,6 +36,15 @@ public class PedidosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(Pedido pedido)
     {
+        foreach (var item in pedido.Itens)
+        {
+            var produto = await _context.Produtos.FindAsync(item.ProdutoId);
+            if (produto == null) return BadRequest($"Produto {item.ProdutoId} não encontrado.");
+            item.PrecoUnitario = produto.Preco;
+        }
+
+        pedido.Total = pedido.Itens.Sum(i => i.PrecoUnitario * i.Quantidade) - pedido.Desconto;
+
         _context.Pedidos.Add(pedido);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = pedido.Id }, pedido);
@@ -45,7 +54,9 @@ public class PedidosController : ControllerBase
     public async Task<IActionResult> Update(int id, Pedido pedido)
     {
         if (id != pedido.Id) return BadRequest();
-        _context.Entry(pedido).State = EntityState.Modified;
+        var existing = await _context.Pedidos.FindAsync(id);
+        if (existing == null) return NotFound();
+        _context.Entry(existing).CurrentValues.SetValues(pedido);
         await _context.SaveChangesAsync();
         return NoContent();
     }
@@ -55,6 +66,21 @@ public class PedidosController : ControllerBase
     {
         var pedido = await _context.Pedidos.FindAsync(id);
         if (pedido == null) return NotFound();
+
+        var transicoes = new Dictionary<StatusPedido, StatusPedido[]>
+        {
+            [StatusPedido.Pendente]    = [StatusPedido.Confirmado, StatusPedido.Cancelado],
+            [StatusPedido.Confirmado]  = [StatusPedido.EmProducao, StatusPedido.Cancelado],
+            [StatusPedido.EmProducao]  = [StatusPedido.Separando,  StatusPedido.Cancelado],
+            [StatusPedido.Separando]   = [StatusPedido.Enviado,    StatusPedido.Cancelado],
+            [StatusPedido.Enviado]     = [StatusPedido.Entregue],
+            [StatusPedido.Entregue]    = [],
+            [StatusPedido.Cancelado]   = [],
+        };
+
+        if (!transicoes[pedido.Status].Contains(status))
+            return BadRequest($"Transição inválida: {pedido.Status} → {status}.");
+
         pedido.Status = status;
         await _context.SaveChangesAsync();
         return NoContent();

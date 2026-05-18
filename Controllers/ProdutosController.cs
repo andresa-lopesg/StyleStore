@@ -43,7 +43,9 @@ public class ProdutosController : ControllerBase
     public async Task<IActionResult> Update(int id, Produto produto)
     {
         if (id != produto.Id) return BadRequest();
-        _context.Entry(produto).State = EntityState.Modified;
+        var existing = await _context.Produtos.FindAsync(id);
+        if (existing == null) return NotFound();
+        _context.Entry(existing).CurrentValues.SetValues(produto);
         await _context.SaveChangesAsync();
         return NoContent();
     }
