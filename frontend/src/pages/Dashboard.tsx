@@ -159,13 +159,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* KPIs — linha 1 */}
+      {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           loading={isLoading}
           title="Receita Total"
           value={`R$ ${receitaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          icon={<div className="w-9 h-9 rounded-lg bg-indigo-600/20 text-(--c-indigo) flex items-center justify-center"><TrendingUp size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><TrendingUp size={16} /></div>}
           delta={calcDelta(receitaAtual, receitaAnterior)}
           sparklineData={receitaSparkData}
         />
@@ -173,7 +173,7 @@ export default function Dashboard() {
           loading={isLoading}
           title="Pedidos"
           value={pedidosAtuais.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-blue-600/20 text-(--c-blue) flex items-center justify-center"><ShoppingCart size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><ShoppingCart size={16} /></div>}
           delta={calcDelta(pedidosAtuais.length, pedidosAnteriores.length)}
           sparklineData={pedidosSparkData}
         />
@@ -181,44 +181,44 @@ export default function Dashboard() {
           loading={isLoading}
           title="Clientes"
           value={clientes.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-green-600/20 text-(--c-green) flex items-center justify-center"><Users size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><Users size={16} /></div>}
           sparklineData={clientesSparkData}
+          subtitle="total cadastrado"
         />
         <StatCard
           loading={isLoading}
           title="Produtos"
           value={produtos.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-purple-600/20 text-(--c-purple) flex items-center justify-center"><Package size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><Package size={16} /></div>}
+          subtitle="no catálogo"
         />
-      </div>
-
-      {/* KPIs — linha 2 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           loading={isLoading}
           title="Funcionários"
           value={funcionarios.length}
-          icon={<div className="w-9 h-9 rounded-lg bg-yellow-600/20 text-(--c-yellow) flex items-center justify-center"><UserCheck size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><UserCheck size={16} /></div>}
+          subtitle="ativos"
         />
         <StatCard
           loading={isLoading}
           title="Pedidos Pendentes"
           value={pendentesAtuais}
-          icon={<div className="w-9 h-9 rounded-lg bg-orange-600/20 text-orange-400 flex items-center justify-center"><ShoppingCart size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><ShoppingCart size={16} /></div>}
           delta={calcDelta(pendentesAtuais, pendentesAnteriores)}
         />
         <StatCard
           loading={isLoading}
           title="Em Produção"
           value={producaoAtiva}
-          icon={<div className="w-9 h-9 rounded-lg bg-cyan-600/20 text-(--c-cyan) flex items-center justify-center"><Factory size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><Factory size={16} /></div>}
           delta={calcDelta(producaoAtualCount, producaoAnteriorCount)}
         />
         <StatCard
           loading={isLoading}
           title="Estoque Baixo"
           value={produtos.filter(p => p.estoqueTotal < 10).length}
-          icon={<div className="w-9 h-9 rounded-lg bg-red-600/20 text-(--c-red) flex items-center justify-center"><Package size={16} /></div>}
+          icon={<div className="w-8 h-8 rounded-lg bg-(--bg-hover) text-(--text-muted) flex items-center justify-center"><Package size={16} /></div>}
+          subtitle="produtos < 10 un"
         />
       </div>
 
