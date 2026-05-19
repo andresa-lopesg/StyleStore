@@ -12,14 +12,17 @@ interface StatCardProps {
 }
 
 export default function StatCard({ title, value, subtitle, icon, delta, sparklineData, loading }: StatCardProps) {
-  const base = 'bg-(--bg-card) rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.35)] flex flex-col justify-between min-h-[120px]';
+  const base = 'bg-(--bg-card) rounded-xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.35)] flex flex-col gap-3';
 
   if (loading) {
     return (
       <div className={base}>
-        <div className="h-3 shimmer rounded w-24" />
-        <div className="h-7 shimmer rounded w-20" />
-        <div className="h-3 shimmer rounded w-16" />
+        <div className="flex items-center justify-between">
+          <div className="h-3 shimmer rounded w-24" />
+          <div className="w-8 h-8 shimmer rounded-lg" />
+        </div>
+        <div className="h-8 shimmer rounded w-28 mt-1" />
+        <div className="h-3 shimmer rounded w-20 mt-1" />
       </div>
     );
   }
@@ -32,22 +35,25 @@ export default function StatCard({ title, value, subtitle, icon, delta, sparklin
         <span className="text-xs text-(--text-muted) font-medium uppercase tracking-wide">{title}</span>
         {icon}
       </div>
-      <div className="flex items-end justify-between gap-2">
-        <p className="text-2xl font-semibold text-(--text-primary)">{value}</p>
+
+      <p className="text-2xl font-bold text-(--text-primary) leading-none">{value}</p>
+
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          {delta !== undefined ? (
+            <div className={`flex items-center gap-1 text-xs ${delta > 0 ? 'text-(--c-green)' : delta < 0 ? 'text-(--c-red)' : 'text-(--text-muted)'}`}>
+              {delta > 0 ? <ArrowUpRight size={12} /> : delta < 0 ? <ArrowDownRight size={12} /> : <Minus size={12} />}
+              <span>{Math.abs(delta)}% vs período anterior</span>
+            </div>
+          ) : subtitle ? (
+            <p className="text-xs text-(--text-muted)">{subtitle}</p>
+          ) : null}
+        </div>
         {sparklineData && (
-          <LineChart width={80} height={32} data={sparklineData}>
+          <LineChart width={72} height={28} data={sparklineData}>
             <Line type="monotone" dataKey="v" stroke={sparkColor} strokeWidth={1.5} dot={false} isAnimationActive={false} />
           </LineChart>
         )}
-      </div>
-      <div>
-        {delta !== undefined && (
-          <div className={`flex items-center gap-1 text-xs ${delta > 0 ? 'text-(--c-green)' : delta < 0 ? 'text-(--c-red)' : 'text-(--text-muted)'}`}>
-            {delta > 0 ? <ArrowUpRight size={12} /> : delta < 0 ? <ArrowDownRight size={12} /> : <Minus size={12} />}
-            <span>{Math.abs(delta)}%</span>
-          </div>
-        )}
-        {subtitle && <p className="text-xs text-(--text-muted)">{subtitle}</p>}
       </div>
     </div>
   );
