@@ -37,6 +37,7 @@ export interface Produto {
   preco: number;
   precoCusto: number;
   estoqueTotal: number;
+  estoqueMinimo: number;
   imagemUrl?: string;
   referencia?: string;
   ativo: boolean;
@@ -108,6 +109,29 @@ export const StatusProducaoLabel: Record<number, string> = {
   3: 'Concluído',
   4: 'Cancelado',
 };
+
+export type TipoMovimentacao = 0 | 1 | 2 | 3;
+
+export const TipoMovimentacaoLabel: Record<number, string> = {
+  0: 'Entrada',
+  1: 'Saída',
+  2: 'Reserva',
+  3: 'Cancelamento',
+};
+
+export interface MovimentacaoEstoque {
+  id: number;
+  produtoId: number;
+  varianteId?: number;
+  tipo: TipoMovimentacao;
+  quantidade: number;
+  estoqueAnterior: number;
+  estoqueAtual: number;
+  motivo?: string;
+  pedidoId?: number;
+  criadoEm: string;
+  variante?: ProdutoVariante;
+}
 
 export interface Producao {
   id: number;

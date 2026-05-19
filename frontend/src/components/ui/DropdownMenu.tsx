@@ -5,6 +5,7 @@ interface MenuItem {
   icon?: React.ReactNode;
   onClick: () => void;
   variant?: 'default' | 'danger';
+  disabled?: boolean;
 }
 
 interface DropdownMenuProps {
@@ -34,11 +35,14 @@ export default function DropdownMenu({ trigger, items }: DropdownMenuProps) {
           {items.map((item, i) => (
             <button
               key={i}
-              onClick={() => { item.onClick(); setOpen(false); }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors hover:bg-(--bg-hover) ${
-                item.variant === 'danger'
-                  ? 'text-(--c-red) hover:text-(--c-red)'
-                  : 'text-(--text-secondary) hover:text-(--text-primary)'
+              onClick={() => { if (!item.disabled) { item.onClick(); setOpen(false); } }}
+              disabled={item.disabled}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors ${
+                item.disabled
+                  ? 'text-(--text-muted) cursor-not-allowed opacity-50'
+                  : item.variant === 'danger'
+                    ? 'text-(--c-red) hover:text-(--c-red) hover:bg-(--bg-hover)'
+                    : 'text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-hover)'
               }`}
             >
               {item.icon}

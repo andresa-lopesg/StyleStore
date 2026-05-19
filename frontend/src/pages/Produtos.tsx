@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Package, AlertTriangle, MoreVertical, Download, LayoutGrid, List, Eye, SearchX } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, AlertTriangle, MoreVertical, Download, LayoutGrid, List, Eye, SearchX, Layers, Wallet, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { produtosService } from '../services/produtos';
 import { categoriasService } from '../services/categorias';
@@ -22,7 +22,7 @@ import EmptyState from '../components/ui/EmptyState';
 
 type FormData = {
   nome: string; descricao: string; preco: number; precoCusto: number;
-  estoqueTotal: number; referencia: string; categoriaId: number; ativo: boolean;
+  estoqueTotal: number; estoqueMinimo: number; referencia: string; categoriaId: number; ativo: boolean;
 };
 
 export default function Produtos() {
@@ -39,6 +39,7 @@ export default function Produtos() {
   const [view, setView] = useState<'list' | 'grid'>('list');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
   const { data: categorias = [] } = useQuery({ queryKey: ['categorias'], queryFn: categoriasService.getAll });
@@ -54,7 +55,14 @@ export default function Produtos() {
   }).length;
   const produtosAtivos = data.filter(p => p.ativo).length;
 
-  useEffect(() => { setSelectedIds([]); }, [search, catFilter, statusFilter, estoqueFilter]);
+  useEffect(() => { setSelectedIds([]); setSelectionMode(false); }, [search, catFilter, statusFilter, estoqueFilter]);
+
+  function toggleSelectionMode() {
+    setSelectionMode(prev => {
+      if (prev) setSelectedIds([]);
+      return !prev;
+    });
+  }
 
   const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
@@ -92,20 +100,28 @@ export default function Produtos() {
 
   function openCreate() {
     setEditing(null);
-    reset({ nome: '', descricao: '', preco: 0, precoCusto: 0, estoqueTotal: 0, referencia: '', categoriaId: 0, ativo: true });
+    reset({ nome: '', descricao: '', preco: 0, precoCusto: 0, estoqueTotal: 0, estoqueMinimo: 0, referencia: '', categoriaId: 0, ativo: true });
     setModalOpen(true);
   }
 
   function openEdit(p: Produto) {
     setEditing(p);
-    reset({ nome: p.nome, descricao: p.descricao, preco: p.preco, precoCusto: p.precoCusto, estoqueTotal: p.estoqueTotal, referencia: p.referencia ?? '', categoriaId: p.categoriaId, ativo: p.ativo });
+    reset({ nome: p.nome, descricao: p.descricao, preco: p.preco, precoCusto: p.precoCusto, estoqueTotal: p.estoqueTotal, estoqueMinimo: p.estoqueMinimo, referencia: p.referencia ?? '', categoriaId: p.categoriaId, ativo: p.ativo });
     setModalOpen(true);
   }
 
   function closeModal() { setModalOpen(false); setEditing(null); reset(); }
 
   function onSubmit(formData: FormData) {
-    const payload = { ...formData, preco: Number(formData.preco), precoCusto: Number(formData.precoCusto), estoqueTotal: Number(formData.estoqueTotal), categoriaId: Number(formData.categoriaId), ativo: Boolean(formData.ativo) };
+    const payload = {
+      ...formData,
+      preco: Number(formData.preco),
+      precoCusto: Number(formData.precoCusto),
+      estoqueTotal: editing ? editing.estoqueTotal : Number(formData.estoqueTotal),
+      estoqueMinimo: Number(formData.estoqueMinimo),
+      categoriaId: Number(formData.categoriaId),
+      ativo: Boolean(formData.ativo),
+    };
     if (editing) updateMutation.mutate({ id: editing.id, data: { ...editing, ...payload } });
     else createMutation.mutate({ ...payload, criadoEm: new Date().toISOString() } as Omit<Produto, 'id' | 'criadoEm' | 'categoria' | 'variantes'>);
   }
@@ -145,6 +161,28 @@ export default function Produtos() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `produtos-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportarCSVSelecionados() {
+    const selecionados = filtered.filter(p => selectedIds.includes(p.id));
+    const headers = ['Nome', 'Referência', 'Categoria', 'Preço (R$)', 'Custo (R$)', 'Estoque', 'Status'];
+    const rows = selecionados.map(p => [
+      `"${p.nome.replace(/"/g, '""')}"`,
+      `"${(p.referencia ?? '').replace(/"/g, '""')}"`,
+      `"${(p.categoria?.nome ?? '').replace(/"/g, '""')}"`,
+      p.preco?.toFixed(2) ?? '0.00',
+      p.precoCusto?.toFixed(2) ?? '0.00',
+      p.estoqueTotal ?? 0,
+      p.ativo ? 'Ativo' : 'Inativo',
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `produtos-selecionados-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -232,37 +270,60 @@ export default function Produtos() {
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {isLoading ? (
           [0, 1, 2, 3].map(i => (
-            <div key={i} className="bg-(--bg-card) border border-(--border) rounded-xl p-5 min-h-[100px]">
-              <div className="h-3 w-24 shimmer rounded mb-2" />
-              <div className="h-7 w-16 shimmer rounded mb-2" />
-              <div className="h-3 w-28 shimmer rounded" />
+            <div key={i} className="bg-(--bg-card) rounded-xl p-5 flex items-center gap-4 min-h-[88px] shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+              <div className="w-11 h-11 rounded-xl shimmer flex-shrink-0" />
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="h-3 w-24 shimmer rounded" />
+                <div className="h-6 w-16 shimmer rounded" />
+                <div className="h-3 w-28 shimmer rounded" />
+              </div>
             </div>
           ))
         ) : (
           <>
-            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
-              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Total de Produtos</p>
-              <p className="text-3xl font-semibold text-(--text-primary)">{totalProdutos}</p>
-              <p className="text-xs text-(--text-secondary)">
-                {novosEsteMes > 0 ? `+${novosEsteMes} este mês` : 'Nenhum novo este mês'}
-              </p>
+            <div className="bg-(--bg-card) rounded-xl p-5 flex items-center gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+              <div className="w-11 h-11 rounded-xl bg-indigo-500/15 flex items-center justify-center flex-shrink-0">
+                <Package size={20} className="text-indigo-400" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Total de Produtos</p>
+                <p className="text-2xl font-semibold text-(--text-primary)">{totalProdutos}</p>
+                <p className="text-xs text-(--text-secondary)">
+                  {novosEsteMes > 0 ? `+${novosEsteMes} este mês` : 'Nenhum novo este mês'}
+                </p>
+              </div>
             </div>
-            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
-              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Estoque Total</p>
-              <p className="text-3xl font-semibold text-(--text-primary)">{totalEstoque.toLocaleString('pt-BR')} un</p>
-              <p className="text-xs text-(--text-secondary)">{produtosAtivos} produtos ativos</p>
+            <div className="bg-(--bg-card) rounded-xl p-5 flex items-center gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+              <div className="w-11 h-11 rounded-xl bg-violet-500/15 flex items-center justify-center flex-shrink-0">
+                <Layers size={20} className="text-violet-400" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Estoque Total</p>
+                <p className="text-2xl font-semibold text-(--text-primary)">{totalEstoque.toLocaleString('pt-BR')} un</p>
+                <p className="text-xs text-(--text-secondary)">{produtosAtivos} produtos ativos</p>
+              </div>
             </div>
-            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
-              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Valor do Estoque</p>
-              <p className="text-3xl font-semibold text-(--text-primary)">
-                {valorEstoque.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-              </p>
-              <p className="text-xs text-(--text-secondary)">Valor total em estoque</p>
+            <div className="bg-(--bg-card) rounded-xl p-5 flex items-center gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+              <div className="w-11 h-11 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                <Wallet size={20} className="text-green-400" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Valor do Estoque</p>
+                <p className="text-2xl font-semibold text-(--text-primary)">
+                  {valorEstoque.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </p>
+                <p className="text-xs text-(--text-secondary)">Valor total em estoque</p>
+              </div>
             </div>
-            <div className="bg-(--bg-card) border border-(--border) rounded-xl p-5 flex flex-col gap-1 min-h-[100px] justify-between">
-              <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Categorias</p>
-              <p className="text-3xl font-semibold text-(--text-primary)">{categoriasAtivas}</p>
-              <p className="text-xs text-(--text-secondary)">Categorias ativas</p>
+            <div className="bg-(--bg-card) rounded-xl p-5 flex items-center gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+              <div className="w-11 h-11 rounded-xl bg-orange-500/15 flex items-center justify-center flex-shrink-0">
+                <Tag size={20} className="text-orange-400" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs font-medium text-(--text-muted) uppercase tracking-wide">Categorias</p>
+                <p className="text-2xl font-semibold text-(--text-primary)">{categoriasAtivas}</p>
+                <p className="text-xs text-(--text-secondary)">Categorias ativas</p>
+              </div>
             </div>
           </>
         )}
@@ -275,14 +336,28 @@ export default function Produtos() {
               <span className="text-xs text-(--text-muted)">{filtered.length} resultado{filtered.length !== 1 ? 's' : ''}</span>
             )}
             <Button
-              variant="secondary"
+              variant={selectionMode ? 'primary' : 'secondary'}
               size="sm"
-              icon={<Download size={13} />}
-              onClick={exportarCSV}
-              disabled={filtered.length === 0}
+              onClick={toggleSelectionMode}
             >
-              Exportar ({filtered.length})
+              {selectionMode ? `${selectedIds.length} selecionado${selectedIds.length !== 1 ? 's' : ''}` : 'Selecionar'}
             </Button>
+            <DropdownMenu
+              trigger={
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={<Download size={13} />}
+                  disabled={filtered.length === 0}
+                >
+                  Exportar
+                </Button>
+              }
+              items={[
+                { label: 'Exportar todos', icon: <Download size={13} />, onClick: exportarCSV },
+                { label: 'Exportar selecionados', icon: <Download size={13} />, onClick: exportarCSVSelecionados, disabled: selectedIds.length === 0 },
+              ]}
+            />
           </>
         )}
       >
@@ -300,7 +375,7 @@ export default function Produtos() {
           onChange={e => setStatusFilter(e.target.value)}
           className="h-9 px-3 min-w-[160px] bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent) cursor-pointer"
         >
-          <option value="">Todos os status</option>
+          <option value="">Todos</option>
           <option value="ativo">Ativo</option>
           <option value="inativo">Inativo</option>
         </select>
@@ -310,7 +385,7 @@ export default function Produtos() {
           className="h-9 px-3 min-w-[160px] bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent) cursor-pointer"
         >
           <option value="">Todos os estoques</option>
-          <option value="baixo">Estoque baixo (&lt;10)</option>
+          <option value="baixo">Estoque baixo</option>
           <option value="zerado">Sem estoque</option>
         </select>
         <div className="flex items-center gap-1 ml-auto">
@@ -337,7 +412,7 @@ export default function Produtos() {
         </div>
       </FilterBar>
 
-      {selectedIds.length > 0 && (
+      {selectionMode && selectedIds.length > 0 && (
         <div className="flex items-center gap-3 px-4 py-2.5 bg-(--bg-elevated) border border-(--border-input) rounded-xl">
           <span className="text-sm text-(--text-secondary)">
             {selectedIds.length} produto{selectedIds.length !== 1 ? 's' : ''} selecionado{selectedIds.length !== 1 ? 's' : ''}
@@ -346,14 +421,14 @@ export default function Produtos() {
           <Button size="sm" variant="danger" icon={<Trash2 size={13} />} onClick={() => setBulkDeleteOpen(true)}>
             Excluir selecionados
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>Cancelar</Button>
+          <Button size="sm" variant="ghost" onClick={toggleSelectionMode}>Cancelar</Button>
         </div>
       )}
 
       {view === 'list' ? (
         <Table
           columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
-          selectable selectedIds={selectedIds} onSelectionChange={ids => setSelectedIds(ids as number[])}
+          selectable={selectionMode} selectedIds={selectionMode ? selectedIds : []} onSelectionChange={selectionMode ? ids => setSelectedIds(ids as number[]) : undefined}
           emptyState={(search || catFilter || statusFilter || estoqueFilter)
             ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description="Tente ajustar os filtros ou limpar a busca." action={{ label: 'Limpar busca', onClick: () => { setSearch(''); setCatFilter(''); setStatusFilter(''); setEstoqueFilter(''); } }} />
             : <EmptyState icon={Package} title="Nenhum produto cadastrado" description="Adicione o primeiro produto para começar." action={{ label: 'Adicionar produto', onClick: openCreate }} />
@@ -415,7 +490,15 @@ export default function Produtos() {
           </div>
           <Input label="Preço de Venda (R$)" type="number" step="0.01" placeholder="99.90" {...register('preco', { required: 'Obrigatório' })} error={errors.preco?.message} isValid={!!dirtyFields.preco && !errors.preco} />
           <Input label="Custo (R$)" type="number" step="0.01" placeholder="45.00" {...register('precoCusto')} />
-          <Input label="Estoque Total" type="number" placeholder="0" {...register('estoqueTotal')} />
+          <Input
+            label="Estoque Total"
+            type="number"
+            placeholder="0"
+            {...register('estoqueTotal')}
+            readOnly={!!editing}
+            className={editing ? 'opacity-60 cursor-not-allowed' : ''}
+          />
+          <Input label="Estoque Mínimo" type="number" placeholder="0" {...register('estoqueMinimo')} />
           <Input label="Referência/SKU" placeholder="CAM-001-BR" {...register('referencia')} />
           <Select label="Categoria" {...register('categoriaId', { required: 'Obrigatório' })} error={errors.categoriaId?.message}>
             <option value="">Selecione...</option>

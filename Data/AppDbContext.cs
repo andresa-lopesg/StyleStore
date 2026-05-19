@@ -14,9 +14,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Pedido> Pedidos { get; set; }
     public DbSet<ItemPedido> ItensPedido { get; set; }
     public DbSet<Producao> Producoes { get; set; }
+    public DbSet<MovimentacaoEstoque> MovimentacoesEstoque { get; set; }
 
 
-//configuram o schema e tipos de coluna. As colunas de cada tabela são definidas pelos Models na pasta Models/. Tudo isso é interpretado pelo Entity Framework para criar o banco automaticamente.
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var agora = DateTime.UtcNow;
@@ -87,5 +87,30 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany(p => p.ItensPedido)
             .HasForeignKey(i => i.ProdutoId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // MovimentacaoEstoque → Produto: Restrict
+        modelBuilder.Entity<MovimentacaoEstoque>()
+            .HasOne(m => m.Produto)
+            .WithMany()
+            .HasForeignKey(m => m.ProdutoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // MovimentacaoEstoque → ProdutoVariante: nullable, SetNull
+        modelBuilder.Entity<MovimentacaoEstoque>()
+            .HasOne(m => m.Variante)
+            .WithMany()
+            .HasForeignKey(m => m.VarianteId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // MovimentacaoEstoque → Pedido: nullable, SetNull
+        modelBuilder.Entity<MovimentacaoEstoque>()
+            .HasOne(m => m.Pedido)
+            .WithMany()
+            .HasForeignKey(m => m.PedidoId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Índice para queries de histórico por produto
+        modelBuilder.Entity<MovimentacaoEstoque>()
+            .HasIndex(m => new { m.ProdutoId, m.CriadoEm });
     }
 }

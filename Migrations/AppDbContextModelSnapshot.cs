@@ -75,8 +75,8 @@ namespace ApiClientes.Migrations
 
                     b.Property<string>("Telefone")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -104,8 +104,8 @@ namespace ApiClientes.Migrations
 
                     b.Property<string>("Cpf")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasMaxLength(14)
+                        .HasColumnType("nvarchar(14)");
 
                     b.Property<DateTime>("CriadoEm")
                         .HasColumnType("datetime2");
@@ -128,8 +128,8 @@ namespace ApiClientes.Migrations
 
                     b.Property<string>("Telefone")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -175,6 +175,52 @@ namespace ApiClientes.Migrations
                     b.HasIndex("ProdutoId");
 
                     b.ToTable("ItensPedido", "dbo");
+                });
+
+            modelBuilder.Entity("ApiClientes.Models.MovimentacaoEstoque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstoqueAnterior")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EstoqueAtual")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Motivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VarianteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId");
+
+                    b.HasIndex("VarianteId");
+
+                    b.HasIndex("ProdutoId", "CriadoEm");
+
+                    b.ToTable("MovimentacoesEstoque", "dbo");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Pedido", b =>
@@ -305,6 +351,9 @@ namespace ApiClientes.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<int>("EstoqueMinimo")
+                        .HasColumnType("int");
+
                     b.Property<int>("EstoqueTotal")
                         .HasColumnType("int");
 
@@ -417,6 +466,31 @@ namespace ApiClientes.Migrations
                     b.Navigation("Pedido");
 
                     b.Navigation("Produto");
+                });
+
+            modelBuilder.Entity("ApiClientes.Models.MovimentacaoEstoque", b =>
+                {
+                    b.HasOne("ApiClientes.Models.Pedido", "Pedido")
+                        .WithMany()
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ApiClientes.Models.Produto", "Produto")
+                        .WithMany()
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ApiClientes.Models.ProdutoVariante", "Variante")
+                        .WithMany()
+                        .HasForeignKey("VarianteId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Pedido");
+
+                    b.Navigation("Produto");
+
+                    b.Navigation("Variante");
                 });
 
             modelBuilder.Entity("ApiClientes.Models.Pedido", b =>

@@ -59,4 +59,61 @@ public class ProdutosController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
+    [HttpGet("{id}/estoque/historico")]
+    public async Task<IActionResult> GetHistoricoEstoque(int id)
+    {
+        var existe = await _context.Produtos.AnyAsync(p => p.Id == id);
+        if (!existe) return NotFound();
+        var historico = await _context.MovimentacoesEstoque
+            .Include(m => m.Variante)
+            .Where(m => m.ProdutoId == id)
+            .OrderByDescending(m => m.CriadoEm)
+            .ToListAsync();
+        return Ok(historico);
+    }
+
+    [HttpPost("{id}/estoque/movimentacao")]
+    public async Task<IActionResult> AjustarEstoque(int id, [FromBody] AjusteEstoqueDto dto)
+    {
+        var produto = await _context.Produtos.FindAsync(id);
+        if (produto == null) return NotFound();
+        if (dto.Quantidade <= 0) return BadRequest("Quantidade deve ser maior que zero.");
+
+        var estoqueAnterior = produto.EstoqueTotal;
+
+        if (dto.Tipo == TipoMovimentacao.Saida)
+        {
+            if (dto.Quantidade > produto.EstoqueTotal)
+                return BadRequest("Quantidade de saída supera o estoque atual.");
+            produto.EstoqueTotal -= dto.Quantidade;
+        }
+        else
+        {
+            produto.EstoqueTotal += dto.Quantidade;
+        }
+
+        var movimentacao = new MovimentacaoEstoque
+        {
+            ProdutoId = id,
+            Tipo = dto.Tipo,
+            Quantidade = dto.Quantidade,
+            EstoqueAnterior = estoqueAnterior,
+            EstoqueAtual = produto.EstoqueTotal,
+            Motivo = dto.Motivo,
+            CriadoEm = DateTime.UtcNow
+        };
+
+        _context.MovimentacoesEstoque.Add(movimentacao);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetHistoricoEstoque), new { id }, movimentacao);
+    }
+}
+
+public class AjusteEstoqueDto
+{
+    public TipoMovimentacao Tipo { get; set; }
+    public int Quantidade { get; set; }
+    public string? Motivo { get; set; }
 }

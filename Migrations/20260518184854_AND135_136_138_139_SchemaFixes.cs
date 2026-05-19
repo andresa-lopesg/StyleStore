@@ -151,8 +151,8 @@ namespace ApiClientes.Migrations
                 name: "Telefone",
                 schema: "dbo",
                 table: "Funcionarios",
-                type: "nvarchar(11)",
-                maxLength: 11,
+                type: "nvarchar(20)",
+                maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
@@ -181,8 +181,8 @@ namespace ApiClientes.Migrations
                 name: "Cpf",
                 schema: "dbo",
                 table: "Funcionarios",
-                type: "nvarchar(11)",
-                maxLength: 11,
+                type: "nvarchar(14)",
+                maxLength: 14,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
@@ -208,8 +208,8 @@ namespace ApiClientes.Migrations
                 name: "Telefone",
                 schema: "dbo",
                 table: "Clientes",
-                type: "nvarchar(11)",
-                maxLength: 11,
+                type: "nvarchar(20)",
+                maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
@@ -501,8 +501,8 @@ namespace ApiClientes.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(11)",
-                oldMaxLength: 11);
+                oldType: "nvarchar(20)",
+                oldMaxLength: 20);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Nome",
@@ -531,8 +531,8 @@ namespace ApiClientes.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(11)",
-                oldMaxLength: 11);
+                oldType: "nvarchar(14)",
+                oldMaxLength: 14);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Cargo",
@@ -551,8 +551,8 @@ namespace ApiClientes.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(11)",
-                oldMaxLength: 11);
+                oldType: "nvarchar(20)",
+                oldMaxLength: 20);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Nome",

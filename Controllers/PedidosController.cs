@@ -40,6 +40,8 @@ public class PedidosController : ControllerBase
         {
             var produto = await _context.Produtos.FindAsync(item.ProdutoId);
             if (produto == null) return BadRequest($"Produto {item.ProdutoId} não encontrado.");
+            if (produto.EstoqueTotal < item.Quantidade)
+                return BadRequest($"Estoque insuficiente para '{produto.Nome}'. Disponível: {produto.EstoqueTotal}");
             item.PrecoUnitario = produto.Preco;
         }
 
@@ -64,7 +66,9 @@ public class PedidosController : ControllerBase
     [HttpPatch("{id}/status")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] StatusPedido status)
     {
-        var pedido = await _context.Pedidos.FindAsync(id);
+        var pedido = await _context.Pedidos
+            .Include(p => p.Itens)
+            .FirstOrDefaultAsync(p => p.Id == id);
         if (pedido == null) return NotFound();
 
         var transicoes = new Dictionary<StatusPedido, StatusPedido[]>
@@ -80,6 +84,47 @@ public class PedidosController : ControllerBase
 
         if (!transicoes[pedido.Status].Contains(status))
             return BadRequest($"Transição inválida: {pedido.Status} → {status}.");
+
+        if (status == StatusPedido.Confirmado)
+        {
+            foreach (var item in pedido.Itens)
+            {
+                var produto = await _context.Produtos.FindAsync(item.ProdutoId);
+                if (produto == null) continue;
+                var anterior = produto.EstoqueTotal;
+                produto.EstoqueTotal -= item.Quantidade;
+                _context.MovimentacoesEstoque.Add(new Models.MovimentacaoEstoque
+                {
+                    ProdutoId = produto.Id,
+                    Tipo = Models.TipoMovimentacao.Saida,
+                    Quantidade = item.Quantidade,
+                    EstoqueAnterior = anterior,
+                    EstoqueAtual = produto.EstoqueTotal,
+                    Motivo = $"Pedido #{pedido.Id}",
+                    PedidoId = pedido.Id,
+                });
+            }
+        }
+        else if (status == StatusPedido.Cancelado && pedido.Status == StatusPedido.Confirmado)
+        {
+            foreach (var item in pedido.Itens)
+            {
+                var produto = await _context.Produtos.FindAsync(item.ProdutoId);
+                if (produto == null) continue;
+                var anterior = produto.EstoqueTotal;
+                produto.EstoqueTotal += item.Quantidade;
+                _context.MovimentacoesEstoque.Add(new Models.MovimentacaoEstoque
+                {
+                    ProdutoId = produto.Id,
+                    Tipo = Models.TipoMovimentacao.Cancelamento,
+                    Quantidade = item.Quantidade,
+                    EstoqueAnterior = anterior,
+                    EstoqueAtual = produto.EstoqueTotal,
+                    Motivo = $"Cancelamento Pedido #{pedido.Id}",
+                    PedidoId = pedido.Id,
+                });
+            }
+        }
 
         pedido.Status = status;
         await _context.SaveChangesAsync();

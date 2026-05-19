@@ -11,6 +11,7 @@ public class Produto
     public decimal Preco { get; set; }
     public decimal PrecoCusto { get; set; }
     public int EstoqueTotal { get; set; }
+    public int EstoqueMinimo { get; set; } = 0;
     [MaxLength(500)] public string? ImagemUrl { get; set; }
     [MaxLength(50)]  public string? Referencia { get; set; }
     public bool Ativo { get; set; } = true;

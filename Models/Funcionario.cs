@@ -8,10 +8,10 @@ public class Funcionario
     public int Id { get; set; }
     [MaxLength(150)] public string Nome { get; set; } = string.Empty;
     [MaxLength(150)] public string Email { get; set; } = string.Empty;
-    [MaxLength(11)]  public string Telefone { get; set; } = string.Empty;
+    [MaxLength(20)]  public string Telefone { get; set; } = string.Empty;
     [MaxLength(100)] public string Cargo { get; set; } = string.Empty;
     public decimal Salario { get; set; }
-    [MaxLength(11)]  public string Cpf { get; set; } = string.Empty;
+    [MaxLength(14)]  public string Cpf { get; set; } = string.Empty;
     public DateTime DataAdmissao { get; set; }
     public bool Ativo { get; set; } = true;
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;

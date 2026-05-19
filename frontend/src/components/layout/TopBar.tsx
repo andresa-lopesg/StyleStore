@@ -34,9 +34,9 @@ export default function TopBar() {
   const { data: produtos = [] } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll, staleTime: 30_000 });
   const { data: pedidos = [] } = useQuery({ queryKey: ['pedidos'], queryFn: pedidosService.getAll, staleTime: 30_000 });
 
-  const semEstoque = produtos.filter(p => p.estoqueTotal === 0);
   const estoqueBaixo = produtos.filter(p => p.estoqueTotal > 0 && p.estoqueTotal < 10);
   const pedidosPendentes = pedidos.filter(p => p.status === 0);
+  const pedidosCancelados = pedidos.filter(p => p.status === 6);
 
   return (
     <header className="h-14 flex items-center justify-between px-6 border-b border-(--border) bg-(--bg-base) shrink-0">
@@ -52,7 +52,7 @@ export default function TopBar() {
             <kbd className="text-[10px] bg-(--bg-hover) px-1.5 py-0.5 rounded border border-(--border) shrink-0">⌘K</kbd>
           </button>
         )}
-        <NotificationDropdown semEstoque={semEstoque} estoqueBaixo={estoqueBaixo} pedidosPendentes={pedidosPendentes} />
+        <NotificationDropdown estoqueBaixo={estoqueBaixo} pedidosPendentes={pedidosPendentes} pedidosCancelados={pedidosCancelados} />
         <button
           onClick={toggleTheme}
           aria-label="Alternar tema"

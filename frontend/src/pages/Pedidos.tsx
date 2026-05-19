@@ -58,7 +58,10 @@ export default function Pedidos() {
   const createMutation = useMutation({
     mutationFn: pedidosService.create,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['pedidos'] }); closeModal(); toast('Pedido criado com sucesso'); },
-    onError: () => toast('Erro ao criar pedido. Tente novamente.', 'error'),
+    onError: (error: unknown) => {
+      const msg = (error as { response?: { data?: string } })?.response?.data;
+      toast(typeof msg === 'string' ? msg : 'Erro ao criar pedido. Tente novamente.', 'error');
+    },
   });
 
   const updateMutation = useMutation({
