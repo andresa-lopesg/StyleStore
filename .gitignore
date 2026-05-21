@@ -5,6 +5,7 @@ obj/
 *.suo
 .vs/
 *.log
+*.lscache
 
 # Frontend
 frontend/node_modules/
