@@ -18,6 +18,9 @@ appsettings.Development.json
 !.env.example
 !**/.env.example
 
+# Uploads (arquivos enviados pelos usuários — ficam no disco, não no git)
+wwwroot/images/
+
 # OS
 .DS_Store
 Thumbs.db
