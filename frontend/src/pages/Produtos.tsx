@@ -90,7 +90,6 @@ export default function Produtos() {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [estoqueFilter, setEstoqueFilter] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editing, setEditing] = useState<Produto | null>(null);
@@ -115,7 +114,7 @@ export default function Produtos() {
   }).length;
   const produtosAtivos = data.filter(p => p.ativo).length;
 
-  useEffect(() => { setSelectedIds([]); setSelectionMode(false); }, [search, catFilter, statusFilter, estoqueFilter]);
+  useEffect(() => { setSelectedIds([]); setSelectionMode(false); }, [search, catFilter, statusFilter]);
 
   function toggleSelectionMode() {
     setSelectionMode(prev => {
@@ -220,11 +219,7 @@ export default function Produtos() {
       if (!statusFilter) return true;
       return statusFilter === 'ativo' ? p.ativo : !p.ativo;
     })
-    .filter(p => {
-      if (estoqueFilter === 'baixo') return p.estoqueTotal > 0 && p.estoqueTotal < 10;
-      if (estoqueFilter === 'zerado') return p.estoqueTotal === 0;
-      return true;
-    });
+;
 
   function exportarCSV() {
     const headers = ['Nome', 'Referência', 'Categoria', 'Preço (R$)', 'Custo (R$)', 'Estoque', 'Status'];
@@ -414,7 +409,7 @@ export default function Produtos() {
       <FilterBar
         actions={(
           <>
-            {(catFilter || statusFilter || estoqueFilter) && (
+            {(catFilter || statusFilter) && (
               <span className="text-xs text-(--text-muted)">{filtered.length} resultado{filtered.length !== 1 ? 's' : ''}</span>
             )}
             <Button
@@ -461,15 +456,6 @@ export default function Produtos() {
           <option value="ativo">Ativo</option>
           <option value="inativo">Inativo</option>
         </select>
-        <select
-          value={estoqueFilter}
-          onChange={e => setEstoqueFilter(e.target.value)}
-          className="h-9 px-3 min-w-[160px] bg-(--bg-elevated) border border-(--border-input) rounded-lg text-sm text-(--text-secondary) outline-none focus:border-(--accent) cursor-pointer"
-        >
-          <option value="">Todos os estoques</option>
-          <option value="baixo">Estoque baixo</option>
-          <option value="zerado">Sem estoque</option>
-        </select>
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={() => setView('list')}
@@ -511,8 +497,8 @@ export default function Produtos() {
         <Table
           columns={columns} data={filtered} keyField="id" loading={isLoading} noPagination
           selectable={selectionMode} selectedIds={selectionMode ? selectedIds : []} onSelectionChange={selectionMode ? ids => setSelectedIds(ids as number[]) : undefined}
-          emptyState={(search || catFilter || statusFilter || estoqueFilter)
-            ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description="Tente ajustar os filtros ou limpar a busca." action={{ label: 'Limpar busca', onClick: () => { setSearch(''); setCatFilter(''); setStatusFilter(''); setEstoqueFilter(''); } }} />
+          emptyState={(search || catFilter || statusFilter)
+            ? <EmptyState icon={SearchX} title="Nenhum resultado encontrado" description="Tente ajustar os filtros ou limpar a busca." action={{ label: 'Limpar busca', onClick: () => { setSearch(''); setCatFilter(''); setStatusFilter(''); } }} />
             : <EmptyState icon={Package} title="Nenhum produto cadastrado" description="Adicione o primeiro produto para começar." action={{ label: 'Adicionar produto', onClick: openCreate }} />
           }
         />
