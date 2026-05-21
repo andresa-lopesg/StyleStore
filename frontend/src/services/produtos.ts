@@ -10,4 +10,11 @@ export const produtosService = {
   getHistoricoEstoque: (id: number) => api.get<MovimentacaoEstoque[]>(`/produtos/${id}/estoque/historico`).then(r => r.data),
   ajustarEstoque: (id: number, data: { tipo: 0 | 1; quantidade: number; motivo?: string }) =>
     api.post<MovimentacaoEstoque>(`/produtos/${id}/estoque/movimentacao`, data).then(r => r.data),
+  uploadImagem: async (id: number, file: File) => {
+    const body = new window.FormData();
+    body.append('arquivo', file);
+    const res = await fetch(`/api/produtos/${id}/imagem`, { method: 'POST', body });
+    if (!res.ok) throw new Error('Upload falhou');
+    return res.json() as Promise<{ url: string }>;
+  },
 };

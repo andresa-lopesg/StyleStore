@@ -60,6 +60,39 @@ public class ProdutosController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id}/imagem")]
+    public async Task<IActionResult> UploadImagem(int id, IFormFile arquivo)
+    {
+        var produto = await _context.Produtos.FindAsync(id);
+        if (produto == null) return NotFound();
+
+        var ext = Path.GetExtension(arquivo.FileName).ToLowerInvariant();
+        if (!new[] { ".jpg", ".jpeg", ".png", ".webp" }.Contains(ext))
+            return BadRequest("Formato não permitido. Use JPG, PNG ou WEBP.");
+
+        if (arquivo.Length > 5 * 1024 * 1024)
+            return BadRequest("Arquivo muito grande. Máximo 5 MB.");
+
+        var dir = Path.Combine("wwwroot", "images", "produtos");
+        Directory.CreateDirectory(dir);
+
+        if (!string.IsNullOrEmpty(produto.ImagemUrl) && produto.ImagemUrl.StartsWith("/images/"))
+        {
+            var oldPath = Path.Combine("wwwroot", produto.ImagemUrl.TrimStart('/'));
+            if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
+        }
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var filePath = Path.Combine(dir, fileName);
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await arquivo.CopyToAsync(stream);
+
+        produto.ImagemUrl = $"/images/produtos/{fileName}";
+        await _context.SaveChangesAsync();
+
+        return Ok(new { url = produto.ImagemUrl });
+    }
+
     [HttpGet("{id}/estoque/historico")]
     public async Task<IActionResult> GetHistoricoEstoque(int id)
     {

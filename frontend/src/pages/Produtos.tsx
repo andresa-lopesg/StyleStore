@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Package, AlertTriangle, MoreVertical, Download, LayoutGrid, List, Eye, SearchX, Layers, Wallet, Tag } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, AlertTriangle, MoreVertical, Download, LayoutGrid, List, Eye, SearchX, Layers, Wallet, Tag, Upload } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { produtosService } from '../services/produtos';
 import { categoriasService } from '../services/categorias';
@@ -25,6 +25,65 @@ type FormData = {
   estoqueTotal: number; estoqueMinimo: number; referencia: string; categoriaId: number; ativo: boolean;
 };
 
+function ImagemUploadField({
+  currentUrl,
+  selectedFile,
+  onFileChange,
+}: {
+  currentUrl?: string | null;
+  selectedFile: File | null;
+  onFileChange: (file: File | null) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentUrl ?? null);
+
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(currentUrl ?? null);
+    }
+  }, [selectedFile, currentUrl]);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    if (file && file.size > 5 * 1024 * 1024) return;
+    onFileChange(file);
+  }
+
+  return (
+    <div className="col-span-2">
+      <p className="text-xs font-medium text-(--text-secondary) mb-1.5">Imagem do Produto</p>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="w-20 h-20 rounded-xl overflow-hidden bg-(--bg-hover) flex items-center justify-center border border-(--border-input) shrink-0 cursor-pointer hover:border-(--accent) transition-colors"
+        >
+          {previewUrl
+            ? <img src={previewUrl} className="w-full h-full object-cover" alt="" onError={() => setPreviewUrl(null)} />
+            : <Upload size={18} className="text-(--text-muted)" />
+          }
+        </button>
+        <div className="flex flex-col gap-2">
+          <Button type="button" variant="secondary" size="sm" icon={<Upload size={13} />} onClick={() => inputRef.current?.click()}>
+            {previewUrl ? 'Trocar imagem' : 'Escolher imagem'}
+          </Button>
+          {selectedFile && (
+            <Button type="button" variant="ghost" size="sm" onClick={() => { onFileChange(null); if (inputRef.current) inputRef.current.value = ''; }}>
+              Cancelar
+            </Button>
+          )}
+          <p className="text-xs text-(--text-muted)">JPG, PNG ou WEBP · máx 5 MB</p>
+        </div>
+      </div>
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleChange} />
+    </div>
+  );
+}
+
 export default function Produtos() {
   const qc = useQueryClient();
   const { toast } = useToast();
@@ -40,6 +99,7 @@ export default function Produtos() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { data = [], isLoading } = useQuery({ queryKey: ['produtos'], queryFn: produtosService.getAll });
   const { data: categorias = [] } = useQuery({ queryKey: ['categorias'], queryFn: categoriasService.getAll });
@@ -66,15 +126,37 @@ export default function Produtos() {
 
   const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<FormData>({ mode: 'onBlur', reValidateMode: 'onChange' });
 
+  const uploadMutation = useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => produtosService.uploadImagem(id, file),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); },
+    onError: () => toast('Erro ao enviar imagem.', 'error'),
+  });
+
   const createMutation = useMutation({
     mutationFn: produtosService.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); toast('Produto criado com sucesso'); },
+    onSuccess: (novoProduto) => {
+      toast('Produto criado com sucesso');
+      if (selectedFile) {
+        uploadMutation.mutate({ id: novoProduto.id, file: selectedFile });
+      } else {
+        qc.invalidateQueries({ queryKey: ['produtos'] });
+        closeModal();
+      }
+    },
     onError: () => toast('Erro ao criar produto. Tente novamente.', 'error'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Produto }) => produtosService.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); toast('Produto atualizado com sucesso'); },
+    onSuccess: () => {
+      toast('Produto atualizado com sucesso');
+      if (selectedFile && editing) {
+        uploadMutation.mutate({ id: editing.id, file: selectedFile });
+      } else {
+        qc.invalidateQueries({ queryKey: ['produtos'] });
+        closeModal();
+      }
+    },
     onError: () => toast('Erro ao atualizar produto. Tente novamente.', 'error'),
   });
 
@@ -110,7 +192,7 @@ export default function Produtos() {
     setModalOpen(true);
   }
 
-  function closeModal() { setModalOpen(false); setEditing(null); reset(); }
+  function closeModal() { setModalOpen(false); setEditing(null); reset(); setSelectedFile(null); }
 
   function onSubmit(formData: FormData) {
     const payload = {
@@ -488,6 +570,7 @@ export default function Produtos() {
           <div className="col-span-2">
             <Textarea label="Descrição" placeholder="Descrição do produto..." rows={2} {...register('descricao')} />
           </div>
+          <ImagemUploadField currentUrl={editing?.imagemUrl} selectedFile={selectedFile} onFileChange={setSelectedFile} />
           <Input label="Preço de Venda (R$)" type="number" step="0.01" placeholder="99.90" {...register('preco', { required: 'Obrigatório' })} error={errors.preco?.message} isValid={!!dirtyFields.preco && !errors.preco} />
           <Input label="Custo (R$)" type="number" step="0.01" placeholder="45.00" {...register('precoCusto')} />
           <Input
@@ -510,7 +593,7 @@ export default function Produtos() {
           </Select>
           <div className="col-span-2 flex justify-end gap-2 pt-2 border-t border-(--border)">
             <Button type="button" variant="secondary" onClick={closeModal}>Cancelar</Button>
-            <Button type="submit" variant="primary" loading={createMutation.isPending || updateMutation.isPending}>
+            <Button type="submit" variant="primary" loading={createMutation.isPending || updateMutation.isPending || uploadMutation.isPending}>
               {editing ? 'Salvar' : 'Criar'}
             </Button>
           </div>
