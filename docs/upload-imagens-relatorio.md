@@ -122,27 +122,6 @@ flowchart TD
 
 ## 4. Erros Encontrados e Soluções
 
-### 4.1 Linha do tempo dos erros
-
-```mermaid
-timeline
-    title Erros durante o desenvolvimento
-    Etapa 1 : Imagens Unsplash rejeitadas
-            : Abordagem descartada
-    Etapa 2 : Content-Type manual quebrava o boundary
-            : Removido header manual
-    Etapa 3 : Axios sobrescrevia Content-Type
-            : Trocado axios por fetch nativo
-    Etapa 4 : Imagens salvas mas retornavam 404
-            : UseStaticFiles apontava para diretório errado
-    Etapa 5 : Erro de namespace no build
-            : Namespace corrigido
-    Etapa 6 : Proxy Vite não repassava /images
-            : Adicionada regra no vite.config.ts
-```
-
----
-
 ### Erro 1 — Abordagem inicial com URLs externas
 
 **Sintoma:** Imagens de produtos exibidas via URLs do Unsplash.
@@ -252,28 +231,7 @@ app.UseStaticFiles(new StaticFileOptions
 
 ---
 
-### Erro 5 — Namespace incorreto causou falha no build
-
-**Sintoma:**
-```
-error CS0234: O nome de tipo ou namespace "StaticFileOptions" não existe
-no namespace "Microsoft.AspNetCore.StaticFiles"
-```
-
-**Causa:** `StaticFileOptions` pertence ao namespace `Microsoft.AspNetCore.Builder`, não `Microsoft.AspNetCore.StaticFiles`.
-
-**Solução:** Correção do namespace:
-```csharp
-// ❌ Errado
-new Microsoft.AspNetCore.StaticFiles.StaticFileOptions
-
-// ✅ Correto
-new Microsoft.AspNetCore.Builder.StaticFileOptions
-```
-
----
-
-### Erro 6 — Vite Proxy não repassava `/images`
+### Erro 5 — Vite Proxy não repassava `/images`
 
 **Sintoma:** Imagens carregadas com 404 no browser mesmo após correção do backend. O backend servia corretamente em `localhost:5067/images/...`, mas o frontend em `localhost:5173` não encontrava.
 
