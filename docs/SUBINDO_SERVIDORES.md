@@ -9,13 +9,19 @@ Você precisa de **dois terminais abertos** — um para o back-end e um para o f
 O banco roda em um container Docker. Você precisa ter o **Docker Desktop** aberto.
 
 1. Abra o **Docker Desktop** e aguarde inicializar (ícone da baleia na barra de menu)
-2. Suba o container do banco (apenas na primeira vez):
+2. Defina a senha do banco no seu shell (ou use o `.env`, veja `.env.example`):
 
 ```bash
-docker run -d --name sql_edge -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=${SA_PASSWORD}' -p 1433:1433 mcr.microsoft.com/azure-sql-edge
+export SA_PASSWORD='escolha-uma-senha-forte'
 ```
 
-3. Nas próximas vezes, se o container já existir, basta iniciar:
+3. Suba o container do banco (apenas na primeira vez):
+
+```bash
+docker run -d --name sql_edge -e 'ACCEPT_EULA=1' -e "MSSQL_SA_PASSWORD=$SA_PASSWORD" -p 1433:1433 mcr.microsoft.com/azure-sql-edge
+```
+
+4. Nas próximas vezes, se o container já existir, basta iniciar:
 
 ```bash
 docker start sql_edge
