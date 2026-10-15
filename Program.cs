@@ -40,10 +40,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+Directory.CreateDirectory(wwwroot);
+
 app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(wwwroot),
     RequestPath = "",
 });
 app.UseCors("AllowFrontend");

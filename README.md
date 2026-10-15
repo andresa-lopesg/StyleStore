@@ -1,8 +1,22 @@
-# StyleStore — Sistema de Gestão de Loja
+# StyleStore
 
-sistema administrativo interno de uma loja que gerencia pedidos, produtos, clientes, funcionários, produção e estoque
+Sistema administrativo de uma loja de moda. Controla pedidos, produtos, clientes, funcionários, produção e estoque, com uma API em ASP.NET Core 8 e um painel em React 19.
 
----
+![Dashboard](docs/screenshots/dashboard.jpg)
+
+## Telas
+
+| Produtos | Pedidos |
+|---|---|
+| ![Produtos](docs/screenshots/produtos.jpg) | ![Pedidos](docs/screenshots/pedidos.jpg) |
+
+| Estoque | Produção |
+|---|---|
+| ![Estoque](docs/screenshots/estoque.jpg) | ![Produção](docs/screenshots/producao.jpg) |
+
+| Clientes |
+|---|
+| ![Clientes](docs/screenshots/clientes.jpg) |
 
 ## Tecnologias
 
@@ -29,113 +43,101 @@ sistema administrativo interno de uma loja que gerencia pedidos, produtos, clien
 | React Hook Form | 7 |
 | Lucide React | 1 |
 
----
-
-## Estrutura do Projeto
+## Estrutura do projeto
 
 ```
-ApiClientes/
+StyleStore/
 ├── Controllers/           # Endpoints da API REST
-│   ├── ClientesController.cs
-│   ├── UsuariosController.cs
-│   ├── CategoriasController.cs
-│   ├── ProdutosController.cs
-│   ├── FuncionariosController.cs
-│   ├── PedidosController.cs
-│   └── ProducaoController.cs
 ├── Models/                # Entidades do banco de dados
-│   ├── Cliente.cs
-│   ├── Usuario.cs
-│   ├── Categoria.cs
-│   ├── Produto.cs
-│   ├── ProdutoVariante.cs
-│   ├── Funcionario.cs
-│   ├── Pedido.cs
-│   ├── ItemPedido.cs
-│   └── Producao.cs
 ├── Data/
-│   └── AppDbContext.cs    # Contexto do Entity Framework
+│   ├── AppDbContext.cs    # Contexto do Entity Framework
+│   └── Seeder.cs          # Dados de exemplo carregados na primeira execução
 ├── Migrations/            # Migrações do banco de dados
-├── appsettings.json                # Configurações gerais
-├── appsettings.Development.json    # String de conexão (ignorado pelo git)
-├── Program.cs             # Configuração da aplicação
+├── docs/                  # Documentação da API, decisões e design system
+├── docker/                # Dockerfiles da API e do front
+├── appsettings.json
+├── appsettings.Development.json    # String de conexão (fora do git)
+├── Program.cs
 └── frontend/              # Aplicação React
     └── src/
         ├── components/
         │   ├── layout/    # Sidebar, TopBar, Layout
         │   └── ui/        # Button, Input, Modal, Table, Badge...
         ├── pages/         # Dashboard, Clientes, Produtos...
-        ├── services/      # Camada de chamadas à API (axios)
+        ├── services/      # Chamadas à API (axios)
         └── types/         # Tipos TypeScript compartilhados
 ```
-
----
 
 ## Pré-requisitos
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 18+](https://nodejs.org)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) para rodar o SQL Server (Azure SQL Edge)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) para rodar o SQL Server
 
----
+## Como rodar
 
-## Configuração do Banco de Dados
+### 1. Banco de dados
 
-O banco roda no **Azure SQL Edge via Docker**. Suba o container antes de iniciar a API:
+O banco roda no Azure SQL Edge, via Docker. Escolha uma senha forte (no mínimo 8 caracteres, com maiúscula, minúscula, número e símbolo) e suba o container:
 
 ```bash
 docker run -d --name sql_edge -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=SuaSenha' -p 1433:1433 mcr.microsoft.com/azure-sql-edge
 ```
 
-Edite a string de conexão em `appsettings.Development.json`:
+Crie o `appsettings.Development.json` na raiz, com a mesma senha:
 
 ```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost,1433;Database=loja;User Id=sa;Password=SuaSenha;TrustServerCertificate=True"
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1433;Database=loja;User Id=sa;Password=SuaSenha;TrustServerCertificate=True"
+  }
 }
 ```
 
----
+Ao iniciar, a API aplica as migrações e carrega dados de exemplo.
 
-## Como Rodar
-
-### 1. Back-end
+### 2. Back-end
 
 ```bash
-# Na raiz do projeto
 dotnet run --environment Development
 ```
 
-A API estará disponível em `http://localhost:5067`
-Documentação Swagger em `http://localhost:5067/swagger`
+A API sobe em `http://localhost:5067`, com o Swagger em `http://localhost:5067/swagger`.
 
-### 2. Front-end
+### 3. Front-end
 
 ```bash
 cd frontend
-npm install      # apenas na primeira vez
+npm install
 npm run dev
 ```
 
-O painel estará disponível em `http://localhost:5173`
+O painel abre em `http://localhost:5173`.
 
----
+### Com Docker Compose
 
-## Módulos do Sistema
+Para subir banco, API e front de uma vez, copie `.env.example` para `.env`, defina `SA_PASSWORD` e rode:
 
-| Módulo | Funcionalidades |
+```bash
+docker compose up --build
+```
+
+## Módulos
+
+| Módulo | O que faz |
 |---|---|
-| **Dashboard** | KPIs em tempo real, gráfico de receita mensal, status de pedidos, últimos pedidos, nível de estoque por produto |
-| **Pedidos** | CRUD completo, visualização detalhada com itens, controle de status (Pendente → Entregue) |
-| **Produtos** | CRUD com categoria, preço de venda e custo, SKU/referência, alerta de estoque baixo |
-| **Categorias** | Gerenciamento de categorias de produto, ativar/inativar |
-| **Clientes** | Cadastro e edição de clientes da loja |
-| **Funcionários** | Cadastro com cargo, salário, CPF, data de admissão |
+| **Dashboard** | Indicadores, receita mensal, status dos pedidos, últimos pedidos e estoque por categoria |
+| **Pedidos** | Cadastro, detalhe com itens e mudança de status (de Pendente a Entregue) |
+| **Produtos** | Cadastro com categoria, preço de venda, custo, referência e alerta de estoque baixo |
+| **Categorias** | Cadastro de categorias, com opção de ativar e inativar |
+| **Clientes** | Cadastro e edição de clientes |
+| **Funcionários** | Cadastro com cargo, salário, CPF e data de admissão |
 | **Produção** | Ordens de produção com progresso, responsável e datas |
-| **Estoque** | Visão consolidada com alertas de estoque zero e baixo, nível visual por produto |
+| **Estoque** | Visão consolidada com alertas de estoque zerado e baixo |
+| **Movimentações** | Histórico de entradas e saídas do estoque |
 | **Usuários** | Usuários do sistema |
 
-### Status de Pedido
+### Status de pedido
 
 | Status | Descrição |
 |---|---|
@@ -147,36 +149,34 @@ O painel estará disponível em `http://localhost:5173`
 | Entregue | Entrega confirmada |
 | Cancelado | Pedido cancelado |
 
-### Status de Produção
+### Status de produção
 
 | Status | Descrição |
 |---|---|
-| Aguardando | Ordem criada, aguardando início |
+| Aguardando | Ordem criada, ainda não iniciada |
 | Em Andamento | Produção em curso |
-| Pausado | Produção temporariamente interrompida |
+| Pausado | Produção interrompida |
 | Concluído | Produção finalizada |
 | Cancelado | Ordem cancelada |
-
----
 
 ## Endpoints da API
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET/POST | `/api/clientes` | Listar / Criar clientes |
-| GET/PUT/DELETE | `/api/clientes/{id}` | Buscar / Editar / Excluir |
-| GET/POST | `/api/produtos` | Listar / Criar produtos |
-| GET/POST | `/api/categorias` | Listar / Criar categorias |
-| GET/POST | `/api/funcionarios` | Listar / Criar funcionários |
-| GET/POST | `/api/pedidos` | Listar / Criar pedidos |
-| PATCH | `/api/pedidos/{id}/status` | Atualizar status do pedido |
-| GET/POST | `/api/producao` | Listar / Criar ordens de produção |
-| PATCH | `/api/producao/{id}/status` | Atualizar status da produção |
-| GET/POST | `/api/usuarios` | Listar / Criar usuários |
+| GET/POST | `/api/clientes` | Listar e criar clientes |
+| GET/PUT/DELETE | `/api/clientes/{id}` | Buscar, editar e excluir |
+| GET/POST | `/api/produtos` | Listar e criar produtos |
+| GET/POST | `/api/categorias` | Listar e criar categorias |
+| GET/POST | `/api/funcionarios` | Listar e criar funcionários |
+| GET/POST | `/api/pedidos` | Listar e criar pedidos |
+| PATCH | `/api/pedidos/{id}/status` | Atualizar o status do pedido |
+| GET/POST | `/api/producao` | Listar e criar ordens de produção |
+| PATCH | `/api/producao/{id}/status` | Atualizar o status da produção |
+| GET/POST | `/api/usuarios` | Listar e criar usuários |
 
----
+A documentação completa está em [docs/API.md](docs/API.md).
 
-## Banco de Dados — Diagrama de Entidades
+## Diagrama de entidades
 
 ```
 Categoria ──< Produto ──< ProdutoVariante
