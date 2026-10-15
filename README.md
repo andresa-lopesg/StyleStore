@@ -1,6 +1,6 @@
 # StyleStore
 
-Sistema administrativo de uma loja de moda. Controla pedidos, produtos, clientes, funcionários, produção e estoque, com uma API em ASP.NET Core 8 e um painel em React 19.
+Sistema administrativo que SIMULA uma loja de moda. Controla pedidos, produtos, clientes, funcionários, produção e estoque, com uma API em ASP.NET Core 8 e um painel em React 19.
 
 ![Dashboard](docs/screenshots/dashboard.jpg)
 
